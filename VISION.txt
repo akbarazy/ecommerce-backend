@@ -1,0 +1,79 @@
+TUJUAN
+- ingin belajar java
+- ingin belajar spring boot
+
+GOAL
+menghasilkan proyek yang bisa membuat rekruter tau bahwa saya layak untuk dipekerjakan
+
+FITUR
+- authentication
+  - register
+  - login
+  - logout
+- authorization
+  - user
+  - admin
+- user management
+  - create profil sendiri
+  - update profil sendiri
+  - update password
+- product management (admin)
+  - create produk
+  - read daftar produk
+  - read detail produk
+  - update produk
+  - delete produk
+- category management (admin)
+  - create kategori
+  - read daftar kategori
+  - update kategori
+  - delete kategori
+- product catalog
+  - read semua produk
+  - read detail produk
+  - search
+  - filter
+  - pagination
+  - sorting
+- shopping cart
+  - create produk ke keranjang
+  - read keranjang
+  - update jumlah produk
+  - delete produk dari keranjang
+  - count total harga
+- checkout
+  - fetch semua item dari shopping ca
+  - count total harga
+  - create order
+  - empty shopping cart
+- order
+  - read daftar order sendiri
+  - read detail order sendiri
+- order (admin)
+  - read semua order dari tiap user
+  - update status order
+- validation
+  - email harus valid
+  - password minimal 8 karakter
+  - harga tidak boleh negatif
+  - nama produk tidak boleh kosong
+- error handling
+  - 400 bad request
+  - 401 unauthorized
+  - 403 forbidden
+  - 404 not found
+
+TECH STACK
+- wajib
+  - java 17 (LTS)
+  - spring boot 3.5.x
+  - spring web
+  - spring data JPA (hibernate)
+  - spring security
+  - validation
+  - postgresql
+  - maven
+- disarankan
+  - lombok
+  - JUnit 5
+  - mockito
