@@ -1,11 +1,13 @@
-TUJUAN
+# PLANNING
+## TUJUAN
 - ingin belajar java
 - ingin belajar spring boot
 
-GOAL
+## GOAL
 menghasilkan proyek yang bisa membuat rekruter tau bahwa saya layak untuk dipekerjakan
 
-FITUR
+# ANALYSIS
+## FITUR
 - authentication
   - register
   - login
@@ -63,7 +65,7 @@ FITUR
   - 403 forbidden
   - 404 not found
 
-TECH STACK
+## TECH STACK
 - wajib
   - java 17 (LTS)
   - spring boot 3.5.x
