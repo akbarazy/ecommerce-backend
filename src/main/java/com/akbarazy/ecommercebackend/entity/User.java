@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.akbarazy.ecommercebackend.entity.enums.Role;
 
 import java.time.LocalDateTime;
 

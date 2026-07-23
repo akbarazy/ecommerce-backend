@@ -2,7 +2,7 @@ package com.akbarazy.ecommercebackend.service.impl;
 
 import com.akbarazy.ecommercebackend.dto.request.RegisterRequest;
 import com.akbarazy.ecommercebackend.dto.response.UserResponse;
-import com.akbarazy.ecommercebackend.entity.Role;
+import com.akbarazy.ecommercebackend.entity.enums.Role;
 import com.akbarazy.ecommercebackend.entity.User;
 import com.akbarazy.ecommercebackend.exception.BadRequestException;
 import com.akbarazy.ecommercebackend.repository.UserRepository;

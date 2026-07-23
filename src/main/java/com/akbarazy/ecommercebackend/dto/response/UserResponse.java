@@ -1,6 +1,6 @@
 package com.akbarazy.ecommercebackend.dto.response;
 
-import com.akbarazy.ecommercebackend.entity.Role;
+import com.akbarazy.ecommercebackend.entity.enums.Role;
 import com.akbarazy.ecommercebackend.entity.User;
 import lombok.Builder;
 import lombok.Data;
