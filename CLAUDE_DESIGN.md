@@ -1,7 +1,7 @@
 # 🏗️ E-Commerce Backend — Design Document
 
 > [!NOTE]
-> Dokumen perancangan lengkap berdasarkan [VISION.txt](file:///c:/Users/Alfarizy/Documents/Programming%20Volume%203/Projects/e-commerce-backend/VISION.txt).
+> Dokumen perancangan lengkap berdasarkan [VISION.txt](file:///c:/Users/Alfarizy/Documents/Programming%20Volume%203/Projects/ecommerce-backend/VISION.txt).
 > Mencakup **Database Design**, **Class Design**, dan **Architecture Design**.
 
 ---

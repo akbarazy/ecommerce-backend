@@ -4,7 +4,7 @@ import com.akbarazy.ecommercebackend.dto.request.RegisterRequest;
 import com.akbarazy.ecommercebackend.dto.response.UserResponse;
 import com.akbarazy.ecommercebackend.entity.enums.Role;
 import com.akbarazy.ecommercebackend.entity.User;
-import com.akbarazy.ecommercebackend.exception.BadRequestException;
+import com.akbarazy.ecommercebackend.exception.ConflictException;
 import com.akbarazy.ecommercebackend.repository.UserRepository;
 import com.akbarazy.ecommercebackend.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public UserResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new BadRequestException("Email is already registered");
+            throw new ConflictException("Email is already registered");
         }
 
         User user = User.builder()

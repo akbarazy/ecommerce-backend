@@ -55,15 +55,7 @@ menghasilkan proyek yang bisa membuat rekruter tau bahwa saya layak untuk dipeke
   - read semua order dari tiap user
   - update status order
 - validation
-  - email harus valid
-  - password minimal 8 karakter
-  - harga tidak boleh negatif
-  - nama produk tidak boleh kosong
-- error handling
-  - 400 bad request
-  - 401 unauthorized
-  - 403 forbidden
-  - 404 not found
+- exception handling
 
 ## TECH STACK
 - wajib

@@ -11,10 +11,10 @@
   </parent>
 
   <groupId>com.akbarazy</groupId>
-  <artifactId>e-commerce-backend</artifactId>
+  <artifactId>ecommerce-backend</artifactId>
   <version>1.0.0</version>
 
-  <name>e-commerce-backend</name>
+  <name>ecommerce-backend</name>
   <url>http://www.example.com</url>
 
   <properties>
