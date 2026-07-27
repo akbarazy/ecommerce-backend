@@ -4,7 +4,7 @@ import com.akbarazy.ecommercebackend.dto.request.RegisterRequest;
 import com.akbarazy.ecommercebackend.dto.response.UserResponse;
 import com.akbarazy.ecommercebackend.entity.User;
 import com.akbarazy.ecommercebackend.entity.enums.Role;
-import com.akbarazy.ecommercebackend.exception.BadRequestException;
+import com.akbarazy.ecommercebackend.exception.ConflictException;
 import com.akbarazy.ecommercebackend.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,189 +14,128 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDateTime;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceImplTest {
-
     @Mock
     private UserRepository userRepository;
-
+    
     @Mock
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private AuthServiceImpl authService;
 
-    // ===== Helper Methods =====
-
-    private RegisterRequest createRegisterRequest(String name, String email, String password) {
-        RegisterRequest request = new RegisterRequest();
-        request.setName(name);
-        request.setEmail(email);
-        request.setPassword(password);
-        return request;
-    }
-
-    private User createSavedUser(Long id, String name, String email, String encodedPassword) {
-        return User.builder()
-                .id(id)
-                .name(name)
-                .email(email)
-                .password(encodedPassword)
-                .role(Role.USER)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
-    }
-
-    // ===== Success Cases =====
-
-    @Test
-    @DisplayName("Register - should register a new user successfully")
-    void register_ShouldReturnUserResponse_WhenEmailIsNew() {
-        // Arrange
-        RegisterRequest request = createRegisterRequest("Test User", "test@example.com", "password123");
-        String encodedPassword = "$2a$10$encodedPassword";
-        User savedUser = createSavedUser(1L, "Test User", "test@example.com", encodedPassword);
-
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
-        when(passwordEncoder.encode("password123")).thenReturn(encodedPassword);
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
-
-        // Act
-        UserResponse response = authService.register(request);
-
-        // Assert
-        assertNotNull(response);
-        assertEquals(1L, response.getId());
-        assertEquals("Test User", response.getName());
-        assertEquals("test@example.com", response.getEmail());
-        assertEquals(Role.USER, response.getRole());
-        assertNull(response.getPhone());
-        assertNull(response.getAddress());
+    private RegisterRequest createRegisterRequest() {
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setName("Akbarazy");
+        registerRequest.setEmail("akbarazy@example.com");
+        registerRequest.setPassword("#password123");
+        return registerRequest;
     }
 
     @Test
-    @DisplayName("Register - should encode the password before saving")
-    void register_ShouldEncodePassword_BeforeSaving() {
-        // Arrange
-        RegisterRequest request = createRegisterRequest("Test User", "test@example.com", "password123");
-        String encodedPassword = "$2a$10$encodedPassword";
-        User savedUser = createSavedUser(1L, "Test User", "test@example.com", encodedPassword);
+    @DisplayName("Register should succeed and return user response when request is valid")
+    void registerValidRequest() {
+        RegisterRequest registerRequest = createRegisterRequest();
 
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(passwordEncoder.encode("password123")).thenReturn(encodedPassword);
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
+        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encoded#password123");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User user = invocation.getArgument(0);
+            user.setId(1L);
+            return user;
+        });
 
-        // Act
-        authService.register(request);
+        UserResponse userResponse = authService.register(registerRequest);
 
-        // Assert
-        verify(passwordEncoder).encode("password123");
-        verify(userRepository).save(argThat(user ->
-                user.getPassword().equals(encodedPassword)
-        ));
+        assertNotNull(userResponse, "User response cannot be null");
+        assertEquals(registerRequest.getName(), userResponse.getName(), "The name must match the register request");
+        assertEquals(registerRequest.getEmail(), userResponse.getEmail(), "The email must match the register request");
+        assertEquals(Role.USER, userResponse.getRole(), "The role must automatically become user");
+        
+        verify(userRepository).existsByEmail(registerRequest.getEmail());
+        verify(passwordEncoder).encode(registerRequest.getPassword());
+        verify(userRepository).save(any(User.class));
     }
 
     @Test
-    @DisplayName("Register - should set role to USER by default")
-    void register_ShouldSetRoleToUser_ByDefault() {
-        // Arrange
-        RegisterRequest request = createRegisterRequest("Test User", "test@example.com", "password123");
-        User savedUser = createSavedUser(1L, "Test User", "test@example.com", "encoded");
+    @DisplayName("Register should execute dependencies in correct order")
+    void registerCallMethodsInCorrectOrder() {
+        RegisterRequest registerRequest = createRegisterRequest();
 
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(passwordEncoder.encode(anyString())).thenReturn("encoded");
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
+        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encoded");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
-        authService.register(request);
+        authService.register(registerRequest);
 
-        // Assert
-        verify(userRepository).save(argThat(user ->
-                user.getRole() == Role.USER
-        ));
+        InOrder inOrder = inOrder(userRepository, passwordEncoder);
+        inOrder.verify(userRepository).existsByEmail(registerRequest.getEmail());
+        inOrder.verify(passwordEncoder).encode(registerRequest.getPassword());
+        inOrder.verify(userRepository).save(any(User.class));
     }
 
     @Test
-    @DisplayName("Register - should not expose password in response")
-    void register_ShouldNotExposePassword_InResponse() {
-        // Arrange
-        RegisterRequest request = createRegisterRequest("Test User", "test@example.com", "password123");
-        User savedUser = createSavedUser(1L, "Test User", "test@example.com", "encoded");
+    @DisplayName("Register should throw conflict exception when email already exists")
+    void registerEmailAlreadyExists() {
+        RegisterRequest registerRequest = createRegisterRequest();
+        
+        when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(true);
+        
+        ConflictException exception = assertThrows(ConflictException.class, () -> {
+            authService.register(registerRequest);
+        });
 
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(passwordEncoder.encode(anyString())).thenReturn("encoded");
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
-
-        // Act
-        UserResponse response = authService.register(request);
-
-        // Assert - UserResponse does not have a password field, confirming it's not exposed
-        assertNotNull(response);
-        assertEquals("test@example.com", response.getEmail());
-    }
-
-    // ===== Failure Cases =====
-
-    @Test
-    @DisplayName("Register - should throw BadRequestException when email is already registered")
-    void register_ShouldThrowBadRequestException_WhenEmailExists() {
-        // Arrange
-        RegisterRequest request = createRegisterRequest("Test User", "existing@example.com", "password123");
-
-        when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
-
-        // Act & Assert
-        BadRequestException exception = assertThrows(
-                BadRequestException.class,
-                () -> authService.register(request)
-        );
-
-        assertEquals("Email is already registered", exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Register - should not encode password when email already exists")
-    void register_ShouldNotEncodePassword_WhenEmailExists() {
-        // Arrange
-        RegisterRequest request = createRegisterRequest("Test User", "existing@example.com", "password123");
-
-        when(userRepository.existsByEmail("existing@example.com")).thenReturn(true);
-
-        // Act & Assert
-        assertThrows(BadRequestException.class, () -> authService.register(request));
+        assertEquals("Email is already registered", exception.getMessage(), "The exception message doesn't match");
 
         verify(passwordEncoder, never()).encode(anyString());
         verify(userRepository, never()).save(any(User.class));
     }
 
-    // ===== Interaction Verification =====
+    @Test
+    @DisplayName("Register should encode password before saving new user data")
+    void registerEncodePassword() {
+        RegisterRequest registerRequest = createRegisterRequest();
+
+        when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
+        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encoded#password123");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            return invocation.getArgument(0);
+        });
+
+        authService.register(registerRequest);
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userCaptor.capture());
+        User capturedUser = userCaptor.getValue();
+
+        assertEquals("encoded#password123", capturedUser.getPassword(), "The password");
+    }
 
     @Test
-    @DisplayName("Register - should call repository methods in the correct order")
-    void register_ShouldCallRepositoryMethods_InCorrectOrder() {
-        // Arrange
-        RegisterRequest request = createRegisterRequest("Test User", "test@example.com", "password123");
-        User savedUser = createSavedUser(1L, "Test User", "test@example.com", "encoded");
+    @DisplayName("Register should set default user role to each new user")
+    void registerDefaultUserRole() {
+        RegisterRequest registerRequest = createRegisterRequest();
 
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(passwordEncoder.encode(anyString())).thenReturn("encoded");
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
-
-        // Act
-        authService.register(request);
-
-        // Assert - verify the order: check email first, then save
-        var inOrder = inOrder(userRepository, passwordEncoder);
-        inOrder.verify(userRepository).existsByEmail("test@example.com");
-        inOrder.verify(passwordEncoder).encode("password123");
-        inOrder.verify(userRepository).save(any(User.class));
+        when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
+        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encoded#password123");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            return invocation.getArgument(0);
+        });
+        
+        authService.register(registerRequest);
+        
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userCaptor.capture());
+        User capturedUser = userCaptor.getValue();
+        
+        assertEquals(Role.USER, capturedUser.getRole());
     }
 }
