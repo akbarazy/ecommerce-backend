@@ -68,6 +68,7 @@ menghasilkan proyek yang bisa membuat rekruter tau bahwa saya layak untuk dipeke
   - postgresql
   - maven
 - disarankan
+  - JJWT
   - lombok
   - JUnit 5
   - mockito
