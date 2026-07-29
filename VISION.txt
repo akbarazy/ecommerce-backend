@@ -7,7 +7,7 @@
 menghasilkan proyek yang bisa membuat rekruter tau bahwa saya layak untuk dipekerjakan
 
 # ANALYSIS
-## FITUR
+## FITUR MVP
 - authentication
   - register
   - login

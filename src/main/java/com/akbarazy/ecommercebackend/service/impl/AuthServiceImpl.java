@@ -21,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    
-    // Kita butuh ini untuk men-generate token JWT
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
