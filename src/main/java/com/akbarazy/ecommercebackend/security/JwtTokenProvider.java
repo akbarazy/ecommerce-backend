@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Component
 public class JwtTokenProvider {
@@ -53,5 +55,18 @@ public class JwtTokenProvider {
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+    public LocalDateTime getExpirationFromToken(String token) {
+        Date expiration = Jwts.parser()
+            .verifyWith(secret)
+            .build()
+            .parseSignedClaims(token)
+            .getPayload()
+            .getExpiration();
+
+        return expiration.toInstant()
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime();
     }
 }
