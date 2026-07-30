@@ -2,6 +2,8 @@ package com.akbarazy.ecommercebackend.controller;
 
 import com.akbarazy.ecommercebackend.dto.request.RegisterRequest;
 import com.akbarazy.ecommercebackend.dto.response.UserResponse;
+import com.akbarazy.ecommercebackend.dto.request.LoginRequest;
+import com.akbarazy.ecommercebackend.dto.response.AuthResponse;
 import com.akbarazy.ecommercebackend.entity.enums.Role;
 import com.akbarazy.ecommercebackend.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +15,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.authentication.BadCredentialsException;
+import com.akbarazy.ecommercebackend.security.JwtTokenProvider;
+import com.akbarazy.ecommercebackend.security.CustomUserDetailsService;
 
 import java.time.LocalDateTime;
 
@@ -34,7 +39,14 @@ class AuthControllerTest {
     @MockitoBean
     private AuthService authService;
 
+    @MockitoBean
+    private JwtTokenProvider jwtTokenProvider;
+
+    @MockitoBean
+    private CustomUserDetailsService customUserDetailsService;
+
     private static final String REGISTER_URL = "/api/auth/register";
+    private static final String LOGIN_URL = "/api/auth/login";
 
     private RegisterRequest createRegisterRequest() {
         RegisterRequest request = new RegisterRequest();
@@ -145,5 +157,119 @@ class AuthControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value("Email is already registered"));
+    }
+
+    private LoginRequest createLoginRequest() {
+        LoginRequest request = new LoginRequest();
+        request.setEmail("akbarazy@example.com");
+        request.setPassword("#password123");
+        return request;
+    }
+
+    private AuthResponse createAuthResponse() {
+        return AuthResponse.builder()
+            .token("jwt-token-xyz-123")
+            .tokenType("Bearer")
+            .user(createUserResponse())
+            .build();
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login should return 200 with auth token when request is valid")
+    void loginValidRequest() throws Exception {
+        LoginRequest loginRequest = createLoginRequest();
+        AuthResponse authResponse = createAuthResponse();
+
+        when(authService.login(any(LoginRequest.class))).thenReturn(authResponse);
+
+        mockMvc.perform(
+            post(LOGIN_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(loginRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success").value(true))
+            .andExpect(jsonPath("$.message").value("Login successful"))
+            .andExpect(jsonPath("$.data.token").value(authResponse.getToken()))
+            .andExpect(jsonPath("$.data.tokenType").value(authResponse.getTokenType()))
+            .andExpect(jsonPath("$.data.user.email").value(loginRequest.getEmail()));
+    }
+    @Test
+    @DisplayName("POST /api/auth/login should return 400 when request body is missing")
+    void loginMissingBody() throws Exception {
+        mockMvc.perform(post(LOGIN_URL)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Request body is missing or unreadable"));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login should return 400 when each field is blank")
+    void loginEachFieldBlank() throws Exception {
+        LoginRequest loginRequest = new LoginRequest();
+        
+        mockMvc.perform(post(LOGIN_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.data.email").value("Email is required"))
+                .andExpect(jsonPath("$.data.password").value("Password is required"));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login should return 400 when email is invalid")
+    void loginInvalidEmail() throws Exception {
+        LoginRequest loginRequest = createLoginRequest();
+        loginRequest.setEmail("not-an-email");
+        
+        mockMvc.perform(post(LOGIN_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Validation failed"))
+                .andExpect(jsonPath("$.data.email").value("Email must be valid"));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login should return 401 when credentials are invalid")
+    void loginInvalidCredentials() throws Exception {
+        LoginRequest loginRequest = createLoginRequest();
+        
+        when(authService.login(any(LoginRequest.class)))
+            .thenThrow(new BadCredentialsException("Invalid email or password"));
+
+        mockMvc.perform(post(LOGIN_URL)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Invalid email or password"));
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/login should return complete response structure")
+    void loginResponseStructure() throws Exception {
+        LoginRequest loginRequest = createLoginRequest();
+        AuthResponse authResponse = createAuthResponse();
+
+        when(authService.login(any(LoginRequest.class))).thenReturn(authResponse);
+
+        mockMvc.perform(
+            post(LOGIN_URL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(loginRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success").exists())
+            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.timestamp").exists())
+            .andExpect(jsonPath("$.data.token").exists())
+            .andExpect(jsonPath("$.data.tokenType").exists())
+            .andExpect(jsonPath("$.data.user.id").exists())
+            .andExpect(jsonPath("$.data.user.name").exists())
+            .andExpect(jsonPath("$.data.user.email").exists())
+            .andExpect(jsonPath("$.data.user.role").exists());
     }
 }
