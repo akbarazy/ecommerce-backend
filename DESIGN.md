@@ -227,7 +227,7 @@ ENDPOINT ACCESS CONFIG
 Authentication:
 POST    /api/auth/register
 POST    /api/auth/login
-GET     /api/auth/logout
+POST    /api/auth/logout
 
 User Profile:
 GET     /api/users/me
