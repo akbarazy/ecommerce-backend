@@ -10,6 +10,9 @@ import com.akbarazy.ecommercebackend.exception.ConflictException;
 import com.akbarazy.ecommercebackend.repository.UserRepository;
 import com.akbarazy.ecommercebackend.security.JwtTokenProvider;
 import com.akbarazy.ecommercebackend.service.AuthService;
+import com.akbarazy.ecommercebackend.entity.BlacklistedToken;
+import com.akbarazy.ecommercebackend.repository.BlacklistedTokenRepository;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +25,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final BlacklistedTokenRepository blacklistedTokenRepository;
 
     @Override
     @Transactional
@@ -56,5 +60,17 @@ public class AuthServiceImpl implements AuthService {
             .token(token)
             .user(UserResponse.register(user))
             .build();
+    }
+
+    @Override
+    public void logout(String token) {
+        LocalDateTime expiryDate = jwtTokenProvider.getExpirationFromToken(token);
+
+        BlacklistedToken blacklistedToken = BlacklistedToken.builder()
+            .token(token)
+            .expiryDate(expiryDate)
+            .build();
+
+        blacklistedTokenRepository.save(blacklistedToken);
     }
 }

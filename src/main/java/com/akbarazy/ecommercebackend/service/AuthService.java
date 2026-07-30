@@ -8,4 +8,5 @@ import com.akbarazy.ecommercebackend.dto.response.UserResponse;
 public interface AuthService {
     UserResponse register(RegisterRequest request);
     AuthResponse login(LoginRequest request);
+    void logout(String token);
 }
