@@ -22,10 +22,13 @@ import com.akbarazy.ecommercebackend.security.CustomUserDetailsService;
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.akbarazy.ecommercebackend.repository.BlacklistedTokenRepository;
 
 @WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -45,8 +48,12 @@ class AuthControllerTest {
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;
 
+    @MockitoBean
+    private BlacklistedTokenRepository blacklistedTokenRepository;
+
     private static final String REGISTER_URL = "/api/auth/register";
     private static final String LOGIN_URL = "/api/auth/login";
+    private static final String LOGOUT_URL = "/api/auth/logout";
 
     private RegisterRequest createRegisterRequest() {
         RegisterRequest request = new RegisterRequest();
@@ -209,13 +216,13 @@ class AuthControllerTest {
         LoginRequest loginRequest = new LoginRequest();
         
         mockMvc.perform(post(LOGIN_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Validation failed"))
-                .andExpect(jsonPath("$.data.email").value("Email is required"))
-                .andExpect(jsonPath("$.data.password").value("Password is required"));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(loginRequest)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.message").value("Validation failed"))
+            .andExpect(jsonPath("$.data.email").value("Email is required"))
+            .andExpect(jsonPath("$.data.password").value("Password is required"));
     }
 
     @Test
@@ -225,12 +232,12 @@ class AuthControllerTest {
         loginRequest.setEmail("not-an-email");
         
         mockMvc.perform(post(LOGIN_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Validation failed"))
-                .andExpect(jsonPath("$.data.email").value("Email must be valid"));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(loginRequest)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.message").value("Validation failed"))
+            .andExpect(jsonPath("$.data.email").value("Email must be valid"));
     }
 
     @Test
@@ -242,11 +249,11 @@ class AuthControllerTest {
             .thenThrow(new BadCredentialsException("Invalid email or password"));
 
         mockMvc.perform(post(LOGIN_URL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Invalid email or password"));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(loginRequest)))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.message").value("Invalid email or password"));
     }
 
     @Test
@@ -271,5 +278,46 @@ class AuthControllerTest {
             .andExpect(jsonPath("$.data.user.name").exists())
             .andExpect(jsonPath("$.data.user.email").exists())
             .andExpect(jsonPath("$.data.user.role").exists());
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/logout should return 200 when token is provided")
+    void logoutValidToken() throws Exception {
+        String token = "jwt-token-xyz-123";
+
+        doNothing().when(authService).logout(token);
+
+        mockMvc.perform(post(LOGOUT_URL)
+            .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success").value(true))
+            .andExpect(jsonPath("$.message").value("Logout successful"));
+
+        verify(authService).logout(token);
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/logout should return 200 even without authorization header")
+    void logoutNoAuthorizationHeader() throws Exception {
+        mockMvc.perform(post(LOGOUT_URL))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.success").value(true))
+            .andExpect(jsonPath("$.message").value("Logout successful"));
+
+        verify(authService, never()).logout(anyString());
+    }
+
+    @Test
+    @DisplayName("POST /api/auth/logout should pass correct token to service")
+    void logoutCallServiceCorrectToken() throws Exception {
+        String token = "specific-jwt-token-abc";
+
+        doNothing().when(authService).logout(token);
+
+        mockMvc.perform(post(LOGOUT_URL)
+            .header("Authorization", "Bearer " + token))
+            .andExpect(status().isOk());
+
+        verify(authService).logout(token);
     }
 }

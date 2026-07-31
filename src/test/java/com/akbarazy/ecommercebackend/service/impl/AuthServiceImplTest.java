@@ -28,6 +28,11 @@ import org.springframework.security.authentication.BadCredentialsException;
 
 import java.util.Optional;
 
+import com.akbarazy.ecommercebackend.entity.BlacklistedToken;
+import com.akbarazy.ecommercebackend.repository.BlacklistedTokenRepository;
+
+import java.time.LocalDateTime;
+
 @ExtendWith(MockitoExtension.class)
 class AuthServiceImplTest {
     @Mock
@@ -38,6 +43,9 @@ class AuthServiceImplTest {
 
     @Mock
     private JwtTokenProvider jwtTokenProvider;
+
+    @Mock
+    private BlacklistedTokenRepository blacklistedTokenRepository;
 
     @InjectMocks
     private AuthServiceImpl authService;
@@ -77,7 +85,7 @@ class AuthServiceImplTest {
 
     @Test
     @DisplayName("Register should execute dependencies in correct order")
-    void registerCallMethodsInCorrectOrder() {
+    void registerCallDependenciesInCorrectOrder() {
         RegisterRequest registerRequest = createRegisterRequest();
 
         when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
@@ -192,7 +200,7 @@ class AuthServiceImplTest {
 
     @Test
     @DisplayName("Login should execute dependencies in correct order")
-    void loginCallMethodsInCorrectOrder() {
+    void loginCallDependenciesInCorrectOrder() {
         LoginRequest loginRequest = createLoginRequest();
         User user = createUser();
         String expectedToken = "jwt.token.here";
@@ -261,5 +269,58 @@ class AuthServiceImplTest {
         verify(userRepository).findByEmail(loginRequest.getEmail());
         verify(passwordEncoder).matches(loginRequest.getPassword(), user.getPassword());
         verify(jwtTokenProvider, never()).generateToken(anyString());
+    }
+
+    @Test
+    @DisplayName("Logout should call dependencies in correct order")
+    void logoutCallDependenciesInCorrectOrder() {
+        String token = "jwt.token.here";
+        LocalDateTime expiryDate = LocalDateTime.now().plusHours(1);
+
+        when(jwtTokenProvider.getExpirationFromToken(token)).thenReturn(expiryDate);
+        when(blacklistedTokenRepository.save(any(BlacklistedToken.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        authService.logout(token);
+
+        InOrder inOrder = inOrder(jwtTokenProvider, blacklistedTokenRepository);
+        inOrder.verify(jwtTokenProvider).getExpirationFromToken(token);
+        inOrder.verify(blacklistedTokenRepository).save(any(BlacklistedToken.class));
+    }
+
+    @Test
+    @DisplayName("Logout should save blacklisted token to repository")
+    void logoutSaveBlacklistedToken() {
+        String token = "jwt.token.here";
+        LocalDateTime expiryDate = LocalDateTime.now().plusHours(1);
+
+        when(jwtTokenProvider.getExpirationFromToken(token)).thenReturn(expiryDate);
+        when(blacklistedTokenRepository.save(any(BlacklistedToken.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        authService.logout(token);
+
+        verify(jwtTokenProvider).getExpirationFromToken(token);
+        verify(blacklistedTokenRepository).save(any(BlacklistedToken.class));
+    }
+
+    @Test
+    @DisplayName("Logout should save correct token value and expiry date")
+    void logoutSaveCorrectTokenAndExpiryDate() {
+        String token = "jwt.token.here";
+        LocalDateTime expiryDate = LocalDateTime.of(2026, 7, 31, 12, 0, 0);
+
+        when(jwtTokenProvider.getExpirationFromToken(token)).thenReturn(expiryDate);
+        when(blacklistedTokenRepository.save(any(BlacklistedToken.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+        authService.logout(token);
+
+        ArgumentCaptor<BlacklistedToken> captor = ArgumentCaptor.forClass(BlacklistedToken.class);
+        verify(blacklistedTokenRepository).save(captor.capture());
+        BlacklistedToken captured = captor.getValue();
+
+        assertEquals(token, captured.getToken());
+        assertEquals(expiryDate, captured.getExpiryDate());
     }
 }
