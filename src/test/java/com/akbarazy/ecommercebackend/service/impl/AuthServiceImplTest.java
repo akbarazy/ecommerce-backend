@@ -54,7 +54,7 @@ class AuthServiceImplTest {
         RegisterRequest registerRequest = new RegisterRequest();
         registerRequest.setName("Akbarazy");
         registerRequest.setEmail("akbarazy@example.com");
-        registerRequest.setPassword("#password123");
+        registerRequest.setPassword("#Password123");
         return registerRequest;
     }
 
@@ -64,7 +64,7 @@ class AuthServiceImplTest {
         RegisterRequest registerRequest = createRegisterRequest();
 
         when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
-        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encoded#password123");
+        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encoded#Password123");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             User user = invocation.getArgument(0);
             user.setId(1L);
@@ -123,7 +123,7 @@ class AuthServiceImplTest {
         RegisterRequest registerRequest = createRegisterRequest();
 
         when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
-        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encoded#password123");
+        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encoded#Password123");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             return invocation.getArgument(0);
         });
@@ -134,7 +134,7 @@ class AuthServiceImplTest {
         verify(userRepository).save(userCaptor.capture());
         User capturedUser = userCaptor.getValue();
 
-        assertEquals("encoded#password123", capturedUser.getPassword());
+        assertEquals("encoded#Password123", capturedUser.getPassword());
     }
 
     @Test
@@ -143,7 +143,7 @@ class AuthServiceImplTest {
         RegisterRequest registerRequest = createRegisterRequest();
 
         when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
-        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encoded#password123");
+        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encoded#Password123");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             return invocation.getArgument(0);
         });
@@ -160,7 +160,7 @@ class AuthServiceImplTest {
     private LoginRequest createLoginRequest() {
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setEmail("akbarazy@example.com");
-        loginRequest.setPassword("#password123");
+        loginRequest.setPassword("#Password123");
         return loginRequest;
     }
 
@@ -169,7 +169,7 @@ class AuthServiceImplTest {
             .id(1L)
             .name("Akbarazy")
             .email("akbarazy@example.com")
-            .password("encoded#password123")
+            .password("encoded#Password123")
             .role(Role.USER)
             .build();
     }

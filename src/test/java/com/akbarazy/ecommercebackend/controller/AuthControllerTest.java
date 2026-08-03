@@ -59,7 +59,7 @@ class AuthControllerTest {
         RegisterRequest request = new RegisterRequest();
         request.setName("Akbarazy");
         request.setEmail("akbarazy@example.com");
-        request.setPassword("#password123");
+        request.setPassword("#Password123");
         return request;
     }
 
@@ -169,7 +169,7 @@ class AuthControllerTest {
     private LoginRequest createLoginRequest() {
         LoginRequest request = new LoginRequest();
         request.setEmail("akbarazy@example.com");
-        request.setPassword("#password123");
+        request.setPassword("#Password123");
         return request;
     }
 
