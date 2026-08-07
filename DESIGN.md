@@ -237,7 +237,7 @@ PUT     /api/users/me/password
 Product Catalog:
 GET     /api/products
 GET     /api/products/{id}
-GET     /api/products/search
+GET     /api/products?keyword=value
 
 Product Management:
 POST    /api/admin/products
