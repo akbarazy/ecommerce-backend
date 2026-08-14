@@ -4,7 +4,7 @@ import com.akbarazy.ecommercebackend.dto.request.RegisterRequest;
 import com.akbarazy.ecommercebackend.dto.response.UserResponse;
 import com.akbarazy.ecommercebackend.dto.request.LoginRequest;
 import com.akbarazy.ecommercebackend.dto.response.AuthResponse;
-import com.akbarazy.ecommercebackend.entity.enums.Role;
+import com.akbarazy.ecommercebackend.entity.enums.UserRole;
 import com.akbarazy.ecommercebackend.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -70,7 +70,7 @@ class AuthControllerTest {
             .email("akbarazy@example.com")
             .phone(null)
             .address(null)
-            .role(Role.USER)
+            .role(UserRole.CUSTOMER)
             .createdAt(LocalDateTime.now())
             .build();
     }

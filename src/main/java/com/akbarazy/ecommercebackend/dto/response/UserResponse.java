@@ -1,6 +1,6 @@
 package com.akbarazy.ecommercebackend.dto.response;
 
-import com.akbarazy.ecommercebackend.entity.enums.Role;
+import com.akbarazy.ecommercebackend.entity.enums.UserRole;
 import com.akbarazy.ecommercebackend.entity.User;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +15,7 @@ public class UserResponse {
     private String email;
     private String phone;
     private String address;
-    private Role role;
+    private UserRole role;
     private LocalDateTime createdAt;
 
     public static UserResponse register(User user) {

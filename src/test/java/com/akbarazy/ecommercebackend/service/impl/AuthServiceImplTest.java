@@ -3,7 +3,7 @@ package com.akbarazy.ecommercebackend.service.impl;
 import com.akbarazy.ecommercebackend.dto.request.RegisterRequest;
 import com.akbarazy.ecommercebackend.dto.response.UserResponse;
 import com.akbarazy.ecommercebackend.entity.User;
-import com.akbarazy.ecommercebackend.entity.enums.Role;
+import com.akbarazy.ecommercebackend.entity.enums.UserRole;
 import com.akbarazy.ecommercebackend.exception.ConflictException;
 import com.akbarazy.ecommercebackend.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -76,7 +76,7 @@ class AuthServiceImplTest {
         assertNotNull(userResponse);
         assertEquals(registerRequest.getName(), userResponse.getName());
         assertEquals(registerRequest.getEmail(), userResponse.getEmail());
-        assertEquals(Role.USER, userResponse.getRole());
+        assertEquals(UserRole.CUSTOMER, userResponse.getRole());
         
         verify(userRepository).existsByEmail(registerRequest.getEmail());
         verify(passwordEncoder).encode(registerRequest.getPassword());
@@ -154,7 +154,7 @@ class AuthServiceImplTest {
         verify(userRepository).save(userCaptor.capture());
         User capturedUser = userCaptor.getValue();
         
-        assertEquals(Role.USER, capturedUser.getRole());
+        assertEquals(UserRole.CUSTOMER, capturedUser.getRole());
     }
 
     private LoginRequest createLoginRequest() {
@@ -170,7 +170,7 @@ class AuthServiceImplTest {
             .name("Akbarazy")
             .email("akbarazy@example.com")
             .password("encoded#Password123")
-            .role(Role.USER)
+            .role(UserRole.CUSTOMER)
             .build();
     }
 

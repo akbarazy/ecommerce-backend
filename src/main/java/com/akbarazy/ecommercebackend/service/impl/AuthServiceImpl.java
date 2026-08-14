@@ -4,7 +4,7 @@ import com.akbarazy.ecommercebackend.dto.request.LoginRequest;
 import com.akbarazy.ecommercebackend.dto.request.RegisterRequest;
 import com.akbarazy.ecommercebackend.dto.response.AuthResponse;
 import com.akbarazy.ecommercebackend.dto.response.UserResponse;
-import com.akbarazy.ecommercebackend.entity.enums.Role;
+import com.akbarazy.ecommercebackend.entity.enums.UserRole;
 import com.akbarazy.ecommercebackend.entity.User;
 import com.akbarazy.ecommercebackend.exception.ConflictException;
 import com.akbarazy.ecommercebackend.repository.UserRepository;
@@ -38,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
             .name(request.getName())
             .email(request.getEmail())
             .password(passwordEncoder.encode(request.getPassword()))
-            .role(Role.USER)
+            .role(UserRole.CUSTOMER)
             .build();
         User savedUser = userRepository.save(user);
         

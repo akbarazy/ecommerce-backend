@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import com.akbarazy.ecommercebackend.entity.enums.Role;
+import com.akbarazy.ecommercebackend.entity.enums.UserRole;
 
 import java.time.LocalDateTime;
 
@@ -40,7 +40,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
     @Builder.Default
-    private Role role = Role.USER;
+    private UserRole role = UserRole.CUSTOMER;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

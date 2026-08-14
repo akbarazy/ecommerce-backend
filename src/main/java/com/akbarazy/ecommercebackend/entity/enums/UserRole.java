@@ -1,6 +1,6 @@
 package com.akbarazy.ecommercebackend.entity.enums;
 
-public enum Role {
-    USER,
+public enum UserRole {
+    CUSTOMER,
     ADMIN
 }
