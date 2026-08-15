@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         
-        ApiResponse<Map<String, String>> response = ApiResponse.error("Validation failed", errors);
+        ApiResponse<Map<String, String>> response = ApiResponse.failed("Validation failed", errors);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -34,43 +34,43 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleHttpMessageNotReadableException(
         org.springframework.http.converter.HttpMessageNotReadableException ex
     ) {
-        ApiResponse<Void> response = ApiResponse.error("Request body is missing or unreadable", null);
+        ApiResponse<Void> response = ApiResponse.failed("Request body is missing or unreadable", null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadRequestException(BadRequestException ex) {
-        ApiResponse<Void> response = ApiResponse.error(ex.getMessage(), null);
+        ApiResponse<Void> response = ApiResponse.failed(ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ApiResponse<Void>> handleConflictException(ConflictException ex) {
-        ApiResponse<Void> response = ApiResponse.error(ex.getMessage(), null);
+        ApiResponse<Void> response = ApiResponse.failed(ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        ApiResponse<Void> response = ApiResponse.error(ex.getMessage(), null);
+        ApiResponse<Void> response = ApiResponse.failed(ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
         @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadCredentialsException(BadCredentialsException ex) {
-        ApiResponse<Void> response = ApiResponse.error(ex.getMessage(), null);
+        ApiResponse<Void> response = ApiResponse.failed(ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiResponse<Void>> handleAuthenticationException(AuthenticationException ex) {
-        ApiResponse<Void> response = ApiResponse.error("Authentication failed", null);
+        ApiResponse<Void> response = ApiResponse.failed("Authentication failed", null);
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGlobalException(Exception ex) {
-        ApiResponse<Void> response = ApiResponse.error("An unexpected error occurred", null);
+        ApiResponse<Void> response = ApiResponse.failed("An unexpected error occurred", null);
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
