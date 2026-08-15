@@ -88,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
 
         cartItemRepository.deleteByUserId(user.getId());
 
-        return OrderResponse.fromEntity(savedOrder);
+        return OrderResponse.from(savedOrder);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class OrderServiceImpl implements OrderService {
     public Page<OrderResponse> getMyOrders(String email, Pageable pageable) {
         User user = getUserByEmail(email);
         Page<Order> orderPage = orderRepository.findByUserIdOrderByCreatedAtDesc(user.getId(), pageable);
-        return orderPage.map(OrderResponse::fromEntity);
+        return orderPage.map(OrderResponse::from);
     }
 
     @Override
@@ -105,13 +105,13 @@ public class OrderServiceImpl implements OrderService {
         User user = getUserByEmail(email);
         Order order = orderRepository.findByIdAndUserId(orderId, user.getId())
             .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
-        return OrderResponse.fromEntity(order);
+        return OrderResponse.from(order);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Page<OrderResponse> getAllOrders(Pageable pageable) {
-        return orderRepository.findAll(pageable).map(OrderResponse::fromEntity);
+        return orderRepository.findAll(pageable).map(OrderResponse::from);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse getOrderById(Long orderId) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new ResourceNotFoundException("Order", "id", orderId));
-        return OrderResponse.fromEntity(order);
+        return OrderResponse.from(order);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(newStatus);
         Order savedOrder = orderRepository.save(order);
 
-        return OrderResponse.fromEntity(savedOrder);
+        return OrderResponse.from(savedOrder);
     }
 
     private User getUserByEmail(String email) {

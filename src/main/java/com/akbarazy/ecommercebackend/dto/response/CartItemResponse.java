@@ -21,7 +21,7 @@ public class CartItemResponse {
     private Integer quantity;
     private BigDecimal subtotal;
 
-    public static CartItemResponse fromEntity(CartItem cartItem) {
+    public static CartItemResponse from(CartItem cartItem) {
         if (cartItem == null) return null;
         
         return CartItemResponse.builder()

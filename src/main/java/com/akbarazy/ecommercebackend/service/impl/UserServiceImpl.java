@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getProfile(String email) {
         User user = getUserByEmail(email);
-        return UserResponse.register(user);
+        return UserResponse.from(user);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService {
         user.setAddress(request.getAddress());
         
         User updatedUser = userRepository.save(user);
-        return UserResponse.register(updatedUser);
+        return UserResponse.from(updatedUser);
     }
 
     @Override

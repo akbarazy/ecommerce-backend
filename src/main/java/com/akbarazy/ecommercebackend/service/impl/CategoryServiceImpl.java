@@ -31,19 +31,19 @@ public class CategoryServiceImpl implements CategoryService {
             .description(request.getDescription())
             .build();
 
-        return CategoryResponse.fromEntity(categoryRepository.save(category));
+        return CategoryResponse.from(categoryRepository.save(category));
     }
 
     @Override
     public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll().stream()
-            .map(CategoryResponse::fromEntity)
+            .map(CategoryResponse::from)
             .collect(Collectors.toList());
     }
 
     @Override
     public CategoryResponse getCategoryById(Long id) {
-        return CategoryResponse.fromEntity(getCategoryEntityById(id));
+        return CategoryResponse.from(getCategoryEntityById(id));
     }
 
     @Override
@@ -58,7 +58,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setName(request.getName());
         category.setDescription(request.getDescription());
 
-        return CategoryResponse.fromEntity(categoryRepository.save(category));
+        return CategoryResponse.from(categoryRepository.save(category));
     }
 
     @Override

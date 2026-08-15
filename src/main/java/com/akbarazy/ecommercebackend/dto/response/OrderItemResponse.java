@@ -15,7 +15,7 @@ public class OrderItemResponse {
     private BigDecimal priceAtPurchase;
     private BigDecimal subtotal;
 
-    public static OrderItemResponse fromEntity(OrderItem orderItem) {
+    public static OrderItemResponse from(OrderItem orderItem) {
         return OrderItemResponse.builder()
                 .id(orderItem.getId())
                 .productName(orderItem.getProduct().getName())

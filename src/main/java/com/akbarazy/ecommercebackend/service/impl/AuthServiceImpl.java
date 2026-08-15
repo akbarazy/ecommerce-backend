@@ -34,15 +34,15 @@ public class AuthServiceImpl implements AuthService {
             throw new ConflictException("Email is already registered");
         }
 
-        User user = User.builder()
+        User newUser = User.builder()
             .name(request.getName())
             .email(request.getEmail())
             .password(passwordEncoder.encode(request.getPassword()))
             .role(UserRole.CUSTOMER)
             .build();
-        User savedUser = userRepository.save(user);
+        User user = userRepository.save(newUser);
         
-        return UserResponse.register(savedUser);
+        return UserResponse.from(user);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class AuthServiceImpl implements AuthService {
 
         return AuthResponse.builder()
             .token(token)
-            .user(UserResponse.register(user))
+            .user(UserResponse.from(user))
             .build();
     }
 

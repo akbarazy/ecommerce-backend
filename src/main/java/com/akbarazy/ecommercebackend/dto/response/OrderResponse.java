@@ -20,9 +20,9 @@ public class OrderResponse {
     private List<OrderItemResponse> items;
     private LocalDateTime createdAt;
 
-    public static OrderResponse fromEntity(Order order) {
+    public static OrderResponse from(Order order) {
         List<OrderItemResponse> itemResponses = order.getOrderItems().stream()
-                .map(OrderItemResponse::fromEntity)
+                .map(OrderItemResponse::from)
                 .collect(Collectors.toList());
 
         return OrderResponse.builder()

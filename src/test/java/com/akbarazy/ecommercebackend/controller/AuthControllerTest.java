@@ -19,8 +19,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import com.akbarazy.ecommercebackend.security.JwtTokenProvider;
 import com.akbarazy.ecommercebackend.security.CustomUserDetailsService;
 
-import java.time.LocalDateTime;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -71,7 +69,6 @@ class AuthControllerTest {
             .phone(null)
             .address(null)
             .role(UserRole.CUSTOMER)
-            .createdAt(LocalDateTime.now())
             .build();
     }
 

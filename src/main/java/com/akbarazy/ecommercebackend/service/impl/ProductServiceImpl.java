@@ -39,19 +39,19 @@ public class ProductServiceImpl implements ProductService {
             .category(category)
             .build();
 
-        return ProductResponse.fromEntity(productRepository.save(product));
+        return ProductResponse.from(productRepository.save(product));
     }
 
     @Override
     public ProductResponse getProductById(Long id) {
-        return ProductResponse.fromEntity(getProductEntityById(id));
+        return ProductResponse.from(getProductEntityById(id));
     }
 
     @Override
     public Page<ProductResponse> getAllProducts(String search, Long categoryId, BigDecimal minPrice, BigDecimal maxPrice, Pageable pageable) {
         Specification<Product> spec = ProductSpecification.filterProducts(search, categoryId, minPrice, maxPrice);
         Page<Product> products = productRepository.findAll(spec, pageable);
-        return products.map(ProductResponse::fromEntity);
+        return products.map(ProductResponse::from);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ProductServiceImpl implements ProductService {
         product.setImageUrl(request.getImageUrl());
         product.setCategory(category);
 
-        return ProductResponse.fromEntity(productRepository.save(product));
+        return ProductResponse.from(productRepository.save(product));
     }
 
     @Override

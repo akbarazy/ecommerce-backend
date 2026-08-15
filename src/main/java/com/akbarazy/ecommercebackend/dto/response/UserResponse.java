@@ -5,8 +5,6 @@ import com.akbarazy.ecommercebackend.entity.User;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 public class UserResponse {
@@ -16,9 +14,8 @@ public class UserResponse {
     private String phone;
     private String address;
     private UserRole role;
-    private LocalDateTime createdAt;
 
-    public static UserResponse register(User user) {
+    public static UserResponse from(User user) {
         return UserResponse.builder()
             .id(user.getId())
             .name(user.getName())
@@ -26,7 +23,6 @@ public class UserResponse {
             .phone(user.getPhone())
             .address(user.getAddress())
             .role(user.getRole())
-            .createdAt(user.getCreatedAt())
             .build();
     }
 }

@@ -15,7 +15,7 @@ public class CategoryResponse {
     private int productCount;
     private LocalDateTime createdAt;
 
-    public static CategoryResponse fromEntity(Category category) {
+    public static CategoryResponse from(Category category) {
         return CategoryResponse.builder()
                 .id(category.getId())
                 .name(category.getName())

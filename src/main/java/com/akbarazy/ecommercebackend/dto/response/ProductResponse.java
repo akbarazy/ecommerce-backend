@@ -20,7 +20,7 @@ public class ProductResponse {
     private String categoryName;
     private LocalDateTime createdAt;
 
-    public static ProductResponse fromEntity(Product product) {
+    public static ProductResponse from(Product product) {
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())

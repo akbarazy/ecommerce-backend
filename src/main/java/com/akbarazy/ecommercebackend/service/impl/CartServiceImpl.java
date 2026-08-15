@@ -62,7 +62,7 @@ public class CartServiceImpl implements CartService {
             savedCartItem = cartItemRepository.save(newItem);
         }
         
-        return CartItemResponse.fromEntity(savedCartItem);
+        return CartItemResponse.from(savedCartItem);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class CartServiceImpl implements CartService {
         List<CartItem> cartItems = cartItemRepository.findByUserId(user.getId());
         
         List<CartItemResponse> itemResponses = cartItems.stream()
-            .map(CartItemResponse::fromEntity)
+            .map(CartItemResponse::from)
             .collect(Collectors.toList());
         
         BigDecimal totalPrice = itemResponses.stream()
@@ -101,7 +101,7 @@ public class CartServiceImpl implements CartService {
         cartItem.setQuantity(request.getQuantity());
         CartItem savedCartItem = cartItemRepository.save(cartItem);
         
-        return CartItemResponse.fromEntity(savedCartItem);
+        return CartItemResponse.from(savedCartItem);
     }
 
     @Override
