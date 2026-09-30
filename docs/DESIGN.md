@@ -10,7 +10,7 @@ ARCHITECTURE DESIGN
 ```mermaid
 ```
 
-ENDPOINT ACCESS CONFIG
+API VISUALIZATION
 ```
 Authentication:
 POST    /api/auth/register

@@ -7,7 +7,7 @@
 menghasilkan proyek yang bisa membuat rekruter tau bahwa saya layak untuk dipekerjakan
 
 # ANALYSIS
-## FITUR MVP
+## FITUR
 - authentication
   - register
   - login
@@ -44,7 +44,7 @@ menghasilkan proyek yang bisa membuat rekruter tau bahwa saya layak untuk dipeke
   - delete produk dari keranjang
   - count total harga
 - checkout
-  - fetch semua item dari shopping ca
+  - fetch semua item dari shopping cart
   - count total harga
   - create order
   - empty shopping cart
@@ -54,8 +54,6 @@ menghasilkan proyek yang bisa membuat rekruter tau bahwa saya layak untuk dipeke
 - order (admin)
   - read semua order dari tiap user
   - update status order
-- validation
-- exception handling
 
 ## TECH STACK
 - wajib
