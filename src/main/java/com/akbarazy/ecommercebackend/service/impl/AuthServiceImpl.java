@@ -31,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public UserResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ConflictException("Email is already registered");
+            throw new ConflictException("Email is already exists");
         }
 
         User newUser = User.builder()

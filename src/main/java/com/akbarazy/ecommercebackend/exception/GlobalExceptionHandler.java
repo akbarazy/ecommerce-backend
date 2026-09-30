@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-        @ExceptionHandler(BadCredentialsException.class)
+    @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ApiResponse<Void>> handleBadCredentialsException(BadCredentialsException ex) {
         ApiResponse<Void> response = ApiResponse.failed(ex.getMessage(), null);
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
