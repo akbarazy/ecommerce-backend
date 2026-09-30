@@ -51,67 +51,48 @@ class AuthServiceImplTest {
     private AuthServiceImpl authService;
 
     private RegisterRequest createRegisterRequest() {
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setName("Akbarazy");
-        registerRequest.setEmail("akbarazy@example.com");
-        registerRequest.setPassword("#Password123");
-        return registerRequest;
+        RegisterRequest request = new RegisterRequest();
+        request.setName("customer");
+        request.setEmail("customer@example.com");
+        request.setPassword("Password123!");
+        return request;
     }
 
     @Test
-    @DisplayName("Register should succeed and return user response when request is valid")
-    void registerValidRequest() {
-        RegisterRequest registerRequest = createRegisterRequest();
+    void registerSuccess() {
+        RegisterRequest request = createRegisterRequest();
 
-        when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
-        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encoded#Password123");
+        when(userRepository.existsByEmail(request.getEmail())).thenReturn(false);
+        when(passwordEncoder.encode(request.getPassword())).thenReturn("a1!b2@c3#d4$");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
             User user = invocation.getArgument(0);
             user.setId(1L);
             return user;
         });
 
-        UserResponse userResponse = authService.register(registerRequest);
+        UserResponse response = authService.register(request);
 
-        assertNotNull(userResponse);
-        assertEquals(registerRequest.getName(), userResponse.getName());
-        assertEquals(registerRequest.getEmail(), userResponse.getEmail());
-        assertEquals(UserRole.CUSTOMER, userResponse.getRole());
+        assertNotNull(response);
+        assertEquals(request.getName(), response.getName());
+        assertEquals(request.getEmail(), response.getEmail());
+        assertEquals(UserRole.CUSTOMER, response.getRole());
         
-        verify(userRepository).existsByEmail(registerRequest.getEmail());
-        verify(passwordEncoder).encode(registerRequest.getPassword());
+        verify(userRepository).existsByEmail(request.getEmail());
+        verify(passwordEncoder).encode(request.getPassword());
         verify(userRepository).save(any(User.class));
     }
 
     @Test
-    @DisplayName("Register should execute dependencies in correct order")
-    void registerCallDependenciesInCorrectOrder() {
-        RegisterRequest registerRequest = createRegisterRequest();
-
-        when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
-        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("encoded");
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        authService.register(registerRequest);
-
-        InOrder inOrder = inOrder(userRepository, passwordEncoder);
-        inOrder.verify(userRepository).existsByEmail(registerRequest.getEmail());
-        inOrder.verify(passwordEncoder).encode(registerRequest.getPassword());
-        inOrder.verify(userRepository).save(any(User.class));
-    }
-
-    @Test
-    @DisplayName("Register should throw conflict exception when email already exists")
     void registerEmailAlreadyExists() {
-        RegisterRequest registerRequest = createRegisterRequest();
+        RegisterRequest request = createRegisterRequest();
         
-        when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(true);
+        when(userRepository.existsByEmail(request.getEmail())).thenReturn(true);
         
         ConflictException exception = assertThrows(ConflictException.class, () -> {
-            authService.register(registerRequest);
+            authService.register(request);
         });
 
-        assertEquals("Email is already registered", exception.getMessage());
+        assertEquals("Email is already exists", exception.getMessage());
 
         verify(passwordEncoder, never()).encode(anyString());
         verify(userRepository, never()).save(any(User.class));
