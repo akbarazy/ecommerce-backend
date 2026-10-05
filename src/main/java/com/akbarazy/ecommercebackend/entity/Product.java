@@ -10,7 +10,6 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -29,16 +28,6 @@ public class Product {
 
     @Column(columnDefinition = "TEXT")
     private String description;
-
-    @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal price;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private Integer stock = 0;
-
-    @Column(name = "image_url", length = 500)
-    private String imageUrl;
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
