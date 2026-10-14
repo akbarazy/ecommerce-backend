@@ -1,5 +1,90 @@
 DATABASE DESIGN
 ```mermaid
+erDiagram
+    USER {
+        BIGINT id PK
+        VARCHAR name
+        VARCHAR email UK
+        VARCHAR password
+        VARCHAR phone
+        TEXT address
+        VARCHAR role
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    CATEGORY {
+        BIGINT id PK
+        VARCHAR name UK
+        TEXT description
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    PRODUCT {
+        BIGINT id PK
+        BIGINT category_id FK
+        VARCHAR name
+        TEXT description
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    VARIANT {
+        BIGINT id PK
+        BIGINT product_id FK
+        VARCHAR sku UK
+        VARCHAR color
+        VARCHAR size
+        DECIMAL price
+        INT stock
+        VARCHAR image_url
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    CART_ITEM {
+        BIGINT id PK
+        BIGINT user_id FK
+        BIGINT product_id FK
+        INT quantity
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    ORDERS {
+        BIGINT id PK
+        BIGINT user_id FK
+        VARCHAR order_number UK
+        DECIMAL total_price
+        VARCHAR status
+        TEXT shipping_address
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    ORDER_ITEM {
+        BIGINT id PK
+        BIGINT order_id FK
+        BIGINT product_id FK
+        INT quantity
+        DECIMAL price_at_purchase
+        TIMESTAMP created_at
+    }
+
+    BLACKLISTED_TOKEN {
+        BIGINT id PK
+        VARCHAR token UK
+        TIMESTAMP expiry_date
+    }
+
+    USER ||--o{ CART_ITEM : has
+    USER ||--o{ ORDERS : places
+    CATEGORY ||--o{ PRODUCT : contains
+    PRODUCT ||--o{ VARIANT : has
+    PRODUCT ||--o{ CART_ITEM : added_as
+    ORDERS ||--|{ ORDER_ITEM : contains
+    PRODUCT ||--o{ ORDER_ITEM : purchased_as
 ```
 
 CLASS DESIGN
