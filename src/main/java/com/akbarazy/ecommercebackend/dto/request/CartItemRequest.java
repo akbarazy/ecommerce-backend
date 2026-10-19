@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartItemRequest {
-    @NotNull(message = "Product ID wajib diisi")
-    private Long productId;
+    @NotNull(message = "Variant ID wajib diisi")
+    private Long variantId;
 
     @NotNull(message = "Quantity wajib diisi")
     @Min(value = 1, message = "Quantity minimal 1")
