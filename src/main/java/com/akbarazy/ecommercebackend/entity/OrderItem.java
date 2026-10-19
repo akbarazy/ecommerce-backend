@@ -20,20 +20,20 @@ public class OrderItem {
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "variant_id", nullable = false)
+    private Variant variant;
 
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column(name = "price_at_purchase", nullable = false)
+    @Column(name = "price_at_purchase", nullable = false, precision = 12, scale = 2)
     private BigDecimal priceAtPurchase;
 
     @CreationTimestamp
@@ -41,9 +41,11 @@ public class OrderItem {
     private LocalDateTime createdAt;
 
     public BigDecimal getSubtotal() {
-        if (priceAtPurchase == null || quantity == null) {
-            return BigDecimal.ZERO;
-        }
+        if (priceAtPurchase == null || quantity == null) return BigDecimal.ZERO;
         return priceAtPurchase.multiply(BigDecimal.valueOf(quantity));
+    }
+
+    public Product getProduct() {
+        return variant != null ? variant.getProduct() : null;
     }
 }

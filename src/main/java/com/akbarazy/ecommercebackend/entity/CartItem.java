@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @Table(
     name = "cart_items",
     uniqueConstraints = @UniqueConstraint(
-        columnNames = {"user_id", "product_id"}
+        columnNames = {"user_id", "variant_id"}
     )
 )
 public class CartItem {
@@ -38,8 +38,8 @@ public class CartItem {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @JoinColumn(name = "variant_id", nullable = false)
+    private Variant variant;
 
     @Column(nullable = false)
     private Integer quantity;
@@ -53,9 +53,11 @@ public class CartItem {
     private LocalDateTime updatedAt;
 
     public BigDecimal getSubtotal() {
-        if (product == null || product.getPrice() == null || quantity == null) {
-            return BigDecimal.ZERO;
-        }
-        return product.getPrice().multiply(BigDecimal.valueOf(quantity));
+        if (variant == null || variant.getPrice() == null || quantity == null) return BigDecimal.ZERO;
+        return variant.getPrice().multiply(BigDecimal.valueOf(quantity));
+    }
+
+    public Product getProduct() {
+        return variant != null ? variant.getProduct() : null;
     }
 }

@@ -46,7 +46,7 @@ erDiagram
     CART_ITEM {
         BIGINT id PK
         BIGINT user_id FK
-        BIGINT product_id FK
+        BIGINT variant_id FK
         INT quantity
         TIMESTAMP created_at
         TIMESTAMP updated_at
@@ -66,7 +66,7 @@ erDiagram
     ORDER_ITEM {
         BIGINT id PK
         BIGINT order_id FK
-        BIGINT product_id FK
+        BIGINT variant_id FK
         INT quantity
         DECIMAL price_at_purchase
         TIMESTAMP created_at
@@ -82,9 +82,9 @@ erDiagram
     USER ||--o{ ORDERS : places
     CATEGORY ||--o{ PRODUCT : contains
     PRODUCT ||--o{ VARIANT : has
-    PRODUCT ||--o{ CART_ITEM : added_as
+    VARIANT ||--o{ CART_ITEM : added_as
     ORDERS ||--|{ ORDER_ITEM : contains
-    PRODUCT ||--o{ ORDER_ITEM : purchased_as
+    VARIANT ||--o{ ORDER_ITEM : purchased_as
 ```
 
 CLASS DESIGN
