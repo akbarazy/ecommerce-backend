@@ -3,33 +3,52 @@
 - ingin belajar java
 - ingin belajar spring boot
 
-## GOAL
-menghasilkan proyek yang bisa membuat rekruter tau bahwa saya layak untuk dipekerjakan
+## HASIL
+meniru sistem backend ecommerce bro.do
 
 # ANALYSIS
+## WBS
+- product variant
+  - membuat entity variant
+  - membuat repository variant
+  - menyesuaikan repository cart item
+  - menyesuaikan entity product, cart item, dan order item
+  - membuat request dan response variant
+  - menyesuaikan request dan response cart item, response product
+  - menyesuaikan service product, cart, dan order 
+  - (tolong lanjutkan dari sini)
+
 ## FITUR
+### ADMIN
+- authentication
+  - login
+  - logout
+- user profile
+  - read profil sendiri
+  - update profil sendiri
+  - update password
+- product management
+  - create produk
+  - update produk
+  - delete produk
+- category management
+  - create kategori
+  - update kategori
+  - delete kategori
+- order management
+  - read semua order dari tiap user
+  - read detail order
+  - update status order
+
+### USER
 - authentication
   - register
   - login
   - logout
-- authorization
-  - user
-  - admin
-- user management
-  - create profil sendiri
+- user profile
+  - read profil sendiri
   - update profil sendiri
   - update password
-- product management (admin)
-  - create produk
-  - read daftar produk
-  - read detail produk
-  - update produk
-  - delete produk
-- category management (admin)
-  - create kategori
-  - read daftar kategori
-  - update kategori
-  - delete kategori
 - product catalog
   - read semua produk
   - read detail produk
@@ -37,6 +56,8 @@ menghasilkan proyek yang bisa membuat rekruter tau bahwa saya layak untuk dipeke
   - filter
   - pagination
   - sorting
+- category catalog
+  - read daftar kategori
 - shopping cart
   - create produk ke keranjang
   - read keranjang
@@ -51,9 +72,6 @@ menghasilkan proyek yang bisa membuat rekruter tau bahwa saya layak untuk dipeke
 - order
   - read daftar order sendiri
   - read detail order sendiri
-- order (admin)
-  - read semua order dari tiap user
-  - update status order
 
 ## TECH STACK
 - wajib
