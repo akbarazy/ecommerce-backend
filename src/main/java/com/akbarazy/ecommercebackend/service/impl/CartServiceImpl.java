@@ -5,13 +5,13 @@ import com.akbarazy.ecommercebackend.dto.request.UpdateCartItemRequest;
 import com.akbarazy.ecommercebackend.dto.response.CartItemResponse;
 import com.akbarazy.ecommercebackend.dto.response.CartResponse;
 import com.akbarazy.ecommercebackend.entity.CartItem;
-import com.akbarazy.ecommercebackend.entity.Product;
 import com.akbarazy.ecommercebackend.entity.User;
+import com.akbarazy.ecommercebackend.entity.Variant;
 import com.akbarazy.ecommercebackend.exception.BadRequestException;
 import com.akbarazy.ecommercebackend.exception.ResourceNotFoundException;
 import com.akbarazy.ecommercebackend.repository.CartItemRepository;
-import com.akbarazy.ecommercebackend.repository.ProductRepository;
 import com.akbarazy.ecommercebackend.repository.UserRepository;
+import com.akbarazy.ecommercebackend.repository.VariantRepository;
 import com.akbarazy.ecommercebackend.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartItemRepository cartItemRepository;
-    private final ProductRepository productRepository;
+    private final VariantRepository variantRepository;
     private final UserRepository userRepository;
 
     private User getUserByEmail(String email) {
@@ -39,24 +39,28 @@ public class CartServiceImpl implements CartService {
     public CartItemResponse addToCart(String email, CartItemRequest request) {
         User user = getUserByEmail(email);
         
-        Product product = productRepository.findById(request.getProductId())
-            .orElseThrow(() -> new ResourceNotFoundException("Product", "id", request.getProductId().toString()));
+        Variant variant = variantRepository.findById(request.getVariantId())
+            .orElseThrow(() -> new ResourceNotFoundException("Variant", "id", request.getVariantId()));
         
-        if (product.getStock() < request.getQuantity()) {
+        if (variant.getStock() < request.getQuantity()) {
             throw new BadRequestException("Stok tidak mencukupi");
         }
         
-        Optional<CartItem> existingItemOptional = cartItemRepository.findByUserIdAndProductId(user.getId(), product.getId());
+        Optional<CartItem> existingItemOptional = cartItemRepository.findByUserIdAndVariantId(user.getId(), variant.getId());
         
         CartItem savedCartItem;
         if (existingItemOptional.isPresent()) {
             CartItem existingItem = existingItemOptional.get();
-            existingItem.setQuantity(existingItem.getQuantity() + request.getQuantity());
+            int newQuantity = existingItem.getQuantity() + request.getQuantity();
+            if (variant.getStock() < newQuantity) {
+                throw new BadRequestException("Stok tidak mencukupi");
+            }
+            existingItem.setQuantity(newQuantity);
             savedCartItem = cartItemRepository.save(existingItem);
         } else {
             CartItem newItem = CartItem.builder()
                 .user(user)
-                .product(product)
+                .variant(variant)
                 .quantity(request.getQuantity())
                 .build();
             savedCartItem = cartItemRepository.save(newItem);
@@ -92,9 +96,9 @@ public class CartServiceImpl implements CartService {
         User user = getUserByEmail(email);
         
         CartItem cartItem = cartItemRepository.findByIdAndUserId(itemId, user.getId())
-            .orElseThrow(() -> new ResourceNotFoundException("CartItem", "id", itemId.toString()));
+            .orElseThrow(() -> new ResourceNotFoundException("CartItem", "id", itemId));
                 
-        if (cartItem.getProduct().getStock() < request.getQuantity()) {
+        if (cartItem.getVariant().getStock() < request.getQuantity()) {
             throw new BadRequestException("Stok tidak mencukupi");
         }
         
@@ -110,7 +114,7 @@ public class CartServiceImpl implements CartService {
         User user = getUserByEmail(email);
         
         CartItem cartItem = cartItemRepository.findByIdAndUserId(itemId, user.getId())
-            .orElseThrow(() -> new ResourceNotFoundException("CartItem", "id", itemId.toString()));
+            .orElseThrow(() -> new ResourceNotFoundException("CartItem", "id", itemId));
                 
         cartItemRepository.delete(cartItem);
     }

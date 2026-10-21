@@ -33,9 +33,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = Product.builder()
             .name(request.getName())
             .description(request.getDescription())
-            .price(request.getPrice())
-            .stock(request.getStock())
-            .imageUrl(request.getImageUrl())
             .category(category)
             .build();
 
@@ -64,9 +61,6 @@ public class ProductServiceImpl implements ProductService {
 
         product.setName(request.getName());
         product.setDescription(request.getDescription());
-        product.setPrice(request.getPrice());
-        product.setStock(request.getStock());
-        product.setImageUrl(request.getImageUrl());
         product.setCategory(category);
 
         return ProductResponse.from(productRepository.save(product));

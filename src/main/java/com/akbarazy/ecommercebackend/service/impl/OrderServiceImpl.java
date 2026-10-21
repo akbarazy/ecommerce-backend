@@ -6,15 +6,15 @@ import com.akbarazy.ecommercebackend.dto.response.OrderResponse;
 import com.akbarazy.ecommercebackend.entity.CartItem;
 import com.akbarazy.ecommercebackend.entity.Order;
 import com.akbarazy.ecommercebackend.entity.OrderItem;
-import com.akbarazy.ecommercebackend.entity.Product;
 import com.akbarazy.ecommercebackend.entity.User;
+import com.akbarazy.ecommercebackend.entity.Variant;
 import com.akbarazy.ecommercebackend.entity.enums.OrderStatus;
 import com.akbarazy.ecommercebackend.exception.BadRequestException;
 import com.akbarazy.ecommercebackend.exception.ResourceNotFoundException;
 import com.akbarazy.ecommercebackend.repository.CartItemRepository;
 import com.akbarazy.ecommercebackend.repository.OrderRepository;
-import com.akbarazy.ecommercebackend.repository.ProductRepository;
 import com.akbarazy.ecommercebackend.repository.UserRepository;
+import com.akbarazy.ecommercebackend.repository.VariantRepository;
 import com.akbarazy.ecommercebackend.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final CartItemRepository cartItemRepository;
-    private final ProductRepository productRepository;
+    private final VariantRepository variantRepository;
     private final UserRepository userRepository;
 
     @Override
@@ -56,20 +56,21 @@ public class OrderServiceImpl implements OrderService {
             .build();
 
         for (CartItem cartItem : cartItems) {
-            Product product = cartItem.getProduct();
+            Variant variant = cartItem.getVariant();
 
-            if (product.getStock() < cartItem.getQuantity()) {
-                throw new BadRequestException("Stok " + product.getName() + " tidak mencukupi");
+            if (variant.getStock() < cartItem.getQuantity()) {
+                String productName = cartItem.getProduct() != null ? cartItem.getProduct().getName() : "produk";
+                throw new BadRequestException("Stok " + productName + " tidak mencukupi");
             }
 
-            product.setStock(product.getStock() - cartItem.getQuantity());
-            productRepository.save(product);
+            variant.setStock(variant.getStock() - cartItem.getQuantity());
+            variantRepository.save(variant);
 
             OrderItem orderItem = OrderItem.builder()
                 .order(order)
-                .product(product)
+                .variant(variant)
                 .quantity(cartItem.getQuantity())
-                .priceAtPurchase(product.getPrice())
+                .priceAtPurchase(variant.getPrice())
                 .build();
 
             order.getOrderItems().add(orderItem);
