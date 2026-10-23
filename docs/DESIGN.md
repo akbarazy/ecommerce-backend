@@ -78,21 +78,13 @@ erDiagram
         TIMESTAMP expiry_date
     }
 
-    USER ||--o{ CART_ITEM : has
-    USER ||--o{ ORDERS : places
-    CATEGORY ||--o{ PRODUCT : contains
-    PRODUCT ||--o{ VARIANT : has
-    VARIANT ||--o{ CART_ITEM : added_as
-    ORDERS ||--|{ ORDER_ITEM : contains
-    VARIANT ||--o{ ORDER_ITEM : purchased_as
-```
-
-CLASS DESIGN
-```mermaid
-```
-
-ARCHITECTURE DESIGN
-```mermaid
+    USER ||--o{ CART_ITEM : "has"
+    USER ||--o{ ORDERS : "places"
+    CATEGORY ||--o{ PRODUCT : "contains"
+    PRODUCT ||--|{ VARIANT : "has (1..*)"
+    VARIANT ||--o{ CART_ITEM : "added_as"
+    ORDERS ||--|{ ORDER_ITEM : "contains (1..*)"
+    VARIANT ||--o{ ORDER_ITEM : "purchased_as"
 ```
 
 API VISUALIZATION
@@ -116,6 +108,12 @@ Product Management:
 POST    /api/admin/products
 PUT     /api/admin/products/{id}
 DELETE  /api/admin/products/{id}
+
+Variant Management:
+GET     /api/admin/products/{productId}/variants
+POST    /api/admin/products/{productId}/variants
+PUT     /api/admin/variants/{id}
+DELETE  /api/admin/variants/{id}
 
 Category Management:
 GET     /api/categories
