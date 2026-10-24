@@ -8,34 +8,65 @@ meniru sistem backend ecommerce bro.do
 
 # ANALYSIS
 ## WBS
-- product variant
-  - membuat entity variant
-  - membuat repository variant
-  - menyesuaikan repository cart item
-  - menyesuaikan entity product, cart item, dan order item
-  - membuat request dan response variant
-  - menyesuaikan request dan response cart item, response product
-  - menyesuaikan service product, cart, dan order 
-  - menyesuaikan CreateProductRequest (menghapus field obsolete price, stock, imageUrl atau mendukung initial variants)
-  - memperbaiki ProductSpecification untuk filter minPrice dan maxPrice (join ke entity Variant dengan query distinct)
-  - membuat VariantService dan VariantServiceImpl
-    - implementasi addVariantToProduct (validasi produk exist dan SKU unik)
-    - implementasi getVariantById dan getVariantsByProductId
-    - implementasi updateVariant (update SKU, atribut warna/ukuran, harga, stok, dan image)
-    - implementasi deleteVariant (validasi data keterkaitan order/cart)
-  - membuat AdminVariantController untuk manajemen varian
-    - endpoint POST /api/admin/products/{productId}/variants
-    - endpoint GET /api/admin/products/{productId}/variants
-    - endpoint PUT /api/admin/variants/{id}
-    - endpoint DELETE /api/admin/variants/{id}
-  - mendaftarkan konfigurasi keamanan endpoint variant di SecurityConfig (ROLE_ADMIN)
-  - memperbaiki unit test yang rusak akibat pemindahan atribut ke variant
-    - ProductServiceImplTest
-    - AdminProductControllerTest
-    - ProductControllerTest
-  - membuat unit test untuk VariantService dan AdminVariantController
-  - menguji integrasi alur bisnis (add to cart, validasi stok, checkout, dan pengurangan stok varian)
-  - memperbarui dokumentasi DESIGN.md (API Visualization) dan VISION.txt (Fitur Admin)
+- Product Variant
+  - Desain & Pemodelan Entitas Database
+    - membuat entitas ProductOption (opsi dinamis per produk, misal: Size, Color)
+    - membuat entitas ProductVariant (sku unik, price, stock, weight, relasi ke Product)
+    - membuat pemetaan nilai opsi varian (misal: entitas VariantValue / ProductVariantOptionValue yang menghubungkan ProductOption dan ProductVariant)
+    - menyesuaikan entitas Product:
+      - menghapus kolom obsolete (stock, price) atau menjadikannya base/starting price
+      - menambahkan relasi OneToMany ke ProductOption dan ProductVariant
+    - menyesuaikan CartItem dan OrderItem:
+      - mengganti relasi dari Product ke ProductVariant
+      - mencatat snapshot nama produk dan atribut varian pada OrderItem
+  - Repository Layer
+    - membuat ProductOptionRepository
+    - membuat ProductVariantRepository (pencarian by SKU, by ProductId, cek duplikasi SKU)
+    - menyesuaikan CartItemRepository (query cart berdasarkan userId dan variantId)
+    - menyesuaikan OrderItemRepository
+  - DTO & Request/Response Layer
+    - membuat ProductOptionRequest dan ProductOptionResponse
+    - membuat VariantOptionValueRequest dan Response
+    - membuat ProductVariantRequest dan ProductVariantResponse
+    - menyesuaikan CreateProductRequest:
+      - menambahkan validasi @NotEmpty/@Valid untuk daftar opsi dan minimal 1 varian awal
+      - validasi bahwa setiap varian wajib mendefinisikan nilai opsi yang telah didaftarkan
+    - menyesuaikan CartItemRequest (productId -> variantId)
+    - menyesuaikan CartItemResponse, OrderItemResponse, dan ProductResponse
+  - Service Layer & Business Logic
+    - menyesuaikan ProductServiceImpl (Create Product flow):
+      - validasi minimal 1 varian dan minimal 1 nilai opsi (Requirement 2)
+      - validasi konsistensi opsi dinamis (Requirement 1)
+      - simpan Product beserta ProductOption dan initial ProductVariant secara transaksional (@Transactional)
+    - membuat ProductVariantService & ProductVariantServiceImpl:
+      - implementasi addVariantToProduct (validasi SKU unik, kecocokan opsi dinamis dengan opsi produk)
+      - implementasi getVariantsByProductId dan getVariantById
+      - implementasi updateVariant (update harga, stok, SKU, dan kombinasi opsi)
+      - implementasi deleteVariant (validasi agar tidak menghapus varian terakhir jika produk aktif, serta cek keterkaitan dengan order)
+    - menyesuaikan CartServiceImpl:
+      - validasi ketersediaan stok ProductVariant saat menambahkan atau mengupdate kuantitas keranjang
+    - menyesuaikan OrderServiceImpl:
+      - validasi ketersediaan stok ProductVariant saat checkout
+      - pengurangan stok pada ProductVariant secara atomik
+    - memperbaiki ProductSpecification:
+      - pencarian & filter harga (minPrice, maxPrice) melalui join ke ProductVariant (distinct)
+      - filter dinamis berdasarkan atribut/opsi jika diperlukan
+  - Controller & API Endpoint Layer
+    - menyesuaikan AdminProductController (POST /api/admin/products menerima produk + varian awal)
+    - membuat AdminProductVariantController:
+      - POST /api/admin/products/{productId}/variants (menambah varian susulan)
+      - GET /api/admin/products/{productId}/variants (melihat semua varian produk)
+      - PUT /api/admin/variants/{id} (edit varian & stok)
+      - DELETE /api/admin/variants/{id} (hapus varian)
+    - menyesuaikan Public ProductController & CartController
+  - Security Configuration
+    - mendaftarkan izin akses endpoint admin varian di SecurityConfig (ROLE_ADMIN)
+    - memastikan endpoint baca varian publik dapat diakses tanpa autentikasi
+  - Unit Test & Integration Test
+    - update unit test yang terdampak (ProductServiceImplTest, AdminProductControllerTest, CartServiceImplTest, OrderServiceImplTest)
+    - membuat unit test untuk validasi minimal 1 varian & 1 nilai varian pada CreateProduct
+    - membuat unit test untuk ProductVariantService dan AdminProductVariantController
+    - integration test alur: Buat Produk ber-Varian -> Masuk Keranjang -> Validasi Stok -> Checkout Order
 
 ## FITUR
 ### ADMIN
