@@ -41,7 +41,13 @@ public class Product {
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<Variant> variants = new ArrayList<>();
+    private List<ProductOption> options = new ArrayList<>();
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductVariant> variants = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -50,4 +56,24 @@ public class Product {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    public void addOption(ProductOption option) {
+        options.add(option);
+        option.setProduct(this);
+    }
+
+    public void removeOption(ProductOption option) {
+        options.remove(option);
+        option.setProduct(null);
+    }
+
+    public void addVariant(ProductVariant variant) {
+        variants.add(variant);
+        variant.setProduct(this);
+    }
+
+    public void removeVariant(ProductVariant variant) {
+        variants.remove(variant);
+        variant.setProduct(null);
+    }
 }

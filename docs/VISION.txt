@@ -9,14 +9,14 @@ meniru sistem backend ecommerce bro.do
 # ANALYSIS
 ## WBS
 - Product Variant
-  - Desain & Pemodelan Entitas Database
-    - membuat entitas ProductOption
-    - membuat entitas ProductVariant
-    - membuat pemetaan nilai opsi varian
-    - menyesuaikan entitas Product:
-      - menghapus kolom obsolete (stock, price) atau menjadikannya base/starting price
+  - Desain & Pemodelan Database
+    - membuat ProductOption (opsi dinamis per produk, misal: Size, Color)
+    - membuat ProductVariant (sku unik, price, stock, weight, relasi ke Product)
+    - membuat pemetaan nilai opsi varian (VariantOption yang menghubungkan ProductVariant dan ProductOption)
+    - menyesuaikan Product
+      - menghapus kolom obsolete (stock, price)
       - menambahkan relasi OneToMany ke ProductOption dan ProductVariant
-    - menyesuaikan CartItem dan OrderItem:
+    - menyesuaikan CartItem dan OrderItem
       - mengganti relasi dari Product ke ProductVariant
       - mencatat snapshot nama produk dan atribut varian pada OrderItem
   - Repository Layer
@@ -28,32 +28,32 @@ meniru sistem backend ecommerce bro.do
     - membuat ProductOptionRequest dan ProductOptionResponse
     - membuat VariantOptionValueRequest dan Response
     - membuat ProductVariantRequest dan ProductVariantResponse
-    - menyesuaikan CreateProductRequest:
+    - menyesuaikan CreateProductRequest
       - menambahkan validasi @NotEmpty/@Valid untuk daftar opsi dan minimal 1 varian awal
       - validasi bahwa setiap varian wajib mendefinisikan nilai opsi yang telah didaftarkan
     - menyesuaikan CartItemRequest (productId -> variantId)
     - menyesuaikan CartItemResponse, OrderItemResponse, dan ProductResponse
   - Service Layer & Business Logic
-    - menyesuaikan ProductServiceImpl (Create Product flow):
+    - menyesuaikan ProductServiceImpl (Create Product flow)
       - validasi minimal 1 varian dan minimal 1 nilai opsi (Requirement 2)
       - validasi konsistensi opsi dinamis (Requirement 1)
       - simpan Product beserta ProductOption dan initial ProductVariant secara transaksional (@Transactional)
-    - membuat ProductVariantService & ProductVariantServiceImpl:
+    - membuat ProductVariantService & ProductVariantServiceImpl
       - implementasi addVariantToProduct (validasi SKU unik, kecocokan opsi dinamis dengan opsi produk)
       - implementasi getVariantsByProductId dan getVariantById
       - implementasi updateVariant (update harga, stok, SKU, dan kombinasi opsi)
       - implementasi deleteVariant (validasi agar tidak menghapus varian terakhir jika produk aktif, serta cek keterkaitan dengan order)
-    - menyesuaikan CartServiceImpl:
+    - menyesuaikan CartServiceImpl
       - validasi ketersediaan stok ProductVariant saat menambahkan atau mengupdate kuantitas keranjang
-    - menyesuaikan OrderServiceImpl:
+    - menyesuaikan OrderServiceImpl
       - validasi ketersediaan stok ProductVariant saat checkout
       - pengurangan stok pada ProductVariant secara atomik
-    - memperbaiki ProductSpecification:
+    - memperbaiki ProductSpecification
       - pencarian & filter harga (minPrice, maxPrice) melalui join ke ProductVariant (distinct)
       - filter dinamis berdasarkan atribut/opsi jika diperlukan
   - Controller & API Endpoint Layer
     - menyesuaikan AdminProductController (POST /api/admin/products menerima produk + varian awal)
-    - membuat AdminProductVariantController:
+    - membuat AdminProductVariantController
       - POST /api/admin/products/{productId}/variants (menambah varian susulan)
       - GET /api/admin/products/{productId}/variants (melihat semua varian produk)
       - PUT /api/admin/variants/{id} (edit varian & stok)
@@ -66,7 +66,7 @@ meniru sistem backend ecommerce bro.do
     - update unit test yang terdampak (ProductServiceImplTest, AdminProductControllerTest, CartServiceImplTest, OrderServiceImplTest)
     - membuat unit test untuk validasi minimal 1 varian & 1 nilai varian pada CreateProduct
     - membuat unit test untuk ProductVariantService dan AdminProductVariantController
-    - integration test alur: Buat Produk ber-Varian -> Masuk Keranjang -> Validasi Stok -> Checkout Order
+    - integration test alur (Buat Produk ber-Varian > Masuk Keranjang > Validasi Stok > Checkout Order)
 
 ## FITUR
 ### ADMIN
