@@ -10,9 +10,9 @@ meniru sistem backend ecommerce bro.do
 ## WBS
 - Product Variant
   - Desain & Pemodelan Entitas Database
-    - membuat entitas ProductOption (opsi dinamis per produk, misal: Size, Color)
-    - membuat entitas ProductVariant (sku unik, price, stock, weight, relasi ke Product)
-    - membuat pemetaan nilai opsi varian (misal: entitas VariantValue / ProductVariantOptionValue yang menghubungkan ProductOption dan ProductVariant)
+    - membuat entitas ProductOption
+    - membuat entitas ProductVariant
+    - membuat pemetaan nilai opsi varian
     - menyesuaikan entitas Product:
       - menghapus kolom obsolete (stock, price) atau menjadikannya base/starting price
       - menambahkan relasi OneToMany ke ProductOption dan ProductVariant
