@@ -1,4 +1,4 @@
-DATABASE DESIGN
+# DATABASE DESIGN
 ```mermaid
 erDiagram
     USER {
@@ -30,15 +30,31 @@ erDiagram
         TIMESTAMP updated_at
     }
 
-    VARIANT {
+    PRODUCT_OPTION {
+        BIGINT id PK
+        BIGINT product_id FK
+        VARCHAR name
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    PRODUCT_VARIANT {
         BIGINT id PK
         BIGINT product_id FK
         VARCHAR sku UK
-        VARCHAR color
-        VARCHAR size
         DECIMAL price
         INT stock
+        DECIMAL weight
         VARCHAR image_url
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    VARIANT_OPTION {
+        BIGINT id PK
+        BIGINT variant_id FK
+        BIGINT option_id FK
+        VARCHAR value
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -52,7 +68,7 @@ erDiagram
         TIMESTAMP updated_at
     }
 
-    ORDERS {
+    ORDER {
         BIGINT id PK
         BIGINT user_id FK
         VARCHAR order_number UK
@@ -67,6 +83,8 @@ erDiagram
         BIGINT id PK
         BIGINT order_id FK
         BIGINT variant_id FK
+        VARCHAR product_name
+        VARCHAR variant_attributes
         INT quantity
         DECIMAL price_at_purchase
         TIMESTAMP created_at
@@ -78,16 +96,19 @@ erDiagram
         TIMESTAMP expiry_date
     }
 
-    USER ||--o{ CART_ITEM : "has"
-    USER ||--o{ ORDERS : "places"
-    CATEGORY ||--o{ PRODUCT : "contains"
-    PRODUCT ||--|{ VARIANT : "has (1..*)"
-    VARIANT ||--o{ CART_ITEM : "added_as"
-    ORDERS ||--|{ ORDER_ITEM : "contains (1..*)"
-    VARIANT ||--o{ ORDER_ITEM : "purchased_as"
+    USER ||--o{ CART_ITEM : ""
+    USER ||--o{ ORDER : ""
+    CATEGORY ||--o{ PRODUCT : ""
+    PRODUCT ||--|{ PRODUCT_OPTION : ""
+    PRODUCT ||--|{ PRODUCT_VARIANT : ""
+    PRODUCT_OPTION ||--o{ VARIANT_OPTION : ""
+    PRODUCT_VARIANT ||--|{ VARIANT_OPTION : ""
+    PRODUCT_VARIANT ||--o{ CART_ITEM : ""
+    ORDER ||--|{ ORDER_ITEM : ""
+    PRODUCT_VARIANT ||--o{ ORDER_ITEM : ""
 ```
 
-API VISUALIZATION
+# API VISUALIZATION
 ```
 Authentication:
 POST    /api/auth/register
@@ -102,7 +123,7 @@ PUT     /api/users/me/password
 Product Catalog:
 GET     /api/products
 GET     /api/products/{id}
-GET     /api/products?keyword=value
+GET     /api/products/{id}/variants
 
 Product Management:
 POST    /api/admin/products
