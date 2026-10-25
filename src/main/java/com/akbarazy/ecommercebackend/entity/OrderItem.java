@@ -28,7 +28,13 @@ public class OrderItem {
     @EqualsAndHashCode.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "variant_id", nullable = false)
-    private Variant variant;
+    private ProductVariant variant;
+
+    @Column(name = "product_name", nullable = false, length = 200)
+    private String productName;
+
+    @Column(name = "variant_attributes", length = 500)
+    private String variantAttributes;
 
     @Column(nullable = false)
     private Integer quantity;
@@ -47,5 +53,20 @@ public class OrderItem {
 
     public Product getProduct() {
         return variant != null ? variant.getProduct() : null;
+    }
+
+    public ProductVariant getProductVariant() {
+        return this.variant;
+    }
+
+    public void setProductVariant(ProductVariant productVariant) {
+        this.variant = productVariant;
+    }
+
+    public static class OrderItemBuilder {
+        public OrderItemBuilder productVariant(ProductVariant productVariant) {
+            this.variant = productVariant;
+            return this;
+        }
     }
 }

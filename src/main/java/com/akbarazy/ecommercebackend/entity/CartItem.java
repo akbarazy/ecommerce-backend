@@ -39,7 +39,7 @@ public class CartItem {
     @EqualsAndHashCode.Exclude
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "variant_id", nullable = false)
-    private Variant variant;
+    private ProductVariant variant;
 
     @Column(nullable = false)
     private Integer quantity;
@@ -59,5 +59,20 @@ public class CartItem {
 
     public Product getProduct() {
         return variant != null ? variant.getProduct() : null;
+    }
+
+    public ProductVariant getProductVariant() {
+        return this.variant;
+    }
+
+    public void setProductVariant(ProductVariant productVariant) {
+        this.variant = productVariant;
+    }
+
+    public static class CartItemBuilder {
+        public CartItemBuilder productVariant(ProductVariant productVariant) {
+            this.variant = productVariant;
+            return this;
+        }
     }
 }
