@@ -26,7 +26,7 @@ meniru sistem backend ecommerce bro.do
     - menyesuaikan OrderItemRepository
   - DTO & Request/Response Layer
     - membuat ProductOptionRequest dan ProductOptionResponse
-    - membuat VariantOptionValueRequest dan Response
+    - membuat VariantOptionRequest dan VariantOptionResponse
     - membuat ProductVariantRequest dan ProductVariantResponse
     - menyesuaikan CreateProductRequest
       - menambahkan validasi @NotEmpty/@Valid untuk daftar opsi dan minimal 1 varian awal
