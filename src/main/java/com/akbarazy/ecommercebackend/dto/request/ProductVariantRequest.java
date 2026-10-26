@@ -42,21 +42,13 @@ public class ProductVariantRequest {
 
     @Valid
     @Builder.Default
-    private List<VariantOptionRequest> optionValues = new ArrayList<>();
+    private List<VariantOptionRequest> variantOptions = new ArrayList<>();
 
-    public List<VariantOptionRequest> getOptions() {
-        return optionValues;
+    public List<VariantOptionRequest> getVariantOptions() {
+        return variantOptions;
     }
 
-    public void setOptions(List<VariantOptionRequest> options) {
-        this.optionValues = options;
-    }
-
-    public List<VariantOptionRequest> getValues() {
-        return optionValues;
-    }
-
-    public void setValues(List<VariantOptionRequest> values) {
-        this.optionValues = values;
+    public void setVariantOptions(List<VariantOptionRequest> options) {
+        this.variantOptions = options;
     }
 }

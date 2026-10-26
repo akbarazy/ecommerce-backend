@@ -1,6 +1,6 @@
 package com.akbarazy.ecommercebackend.controller;
 
-import com.akbarazy.ecommercebackend.dto.request.CreateProductRequest;
+import com.akbarazy.ecommercebackend.dto.request.ProductRequest;
 import com.akbarazy.ecommercebackend.dto.response.ApiResponse;
 import com.akbarazy.ecommercebackend.dto.response.ProductResponse;
 import com.akbarazy.ecommercebackend.service.ProductService;
@@ -17,7 +17,7 @@ public class AdminProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(@Valid @RequestBody CreateProductRequest request) {
+    public ResponseEntity<ApiResponse<ProductResponse>> createProduct(@Valid @RequestBody ProductRequest request) {
         ProductResponse response = productService.createProduct(request);
         return new ResponseEntity<>(ApiResponse.success("Product created successfully", response), HttpStatus.CREATED);
     }
@@ -25,7 +25,7 @@ public class AdminProductController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
             @PathVariable Long id, 
-            @Valid @RequestBody CreateProductRequest request) {
+            @Valid @RequestBody ProductRequest request) {
         ProductResponse response = productService.updateProduct(id, request);
         return new ResponseEntity<>(ApiResponse.success("Product updated successfully", response), HttpStatus.OK);
     }

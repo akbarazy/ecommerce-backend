@@ -1,6 +1,6 @@
 package com.akbarazy.ecommercebackend.service.impl;
 
-import com.akbarazy.ecommercebackend.dto.request.CreateProductRequest;
+import com.akbarazy.ecommercebackend.dto.request.ProductRequest;
 import com.akbarazy.ecommercebackend.dto.response.ProductResponse;
 import com.akbarazy.ecommercebackend.entity.Category;
 import com.akbarazy.ecommercebackend.entity.Product;
@@ -26,7 +26,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductResponse createProduct(CreateProductRequest request) {
+    public ProductResponse createProduct(ProductRequest request) {
         Category category = categoryRepository.findById(request.getCategoryId())
             .orElseThrow(() -> new ResourceNotFoundException("Category", "id", request.getCategoryId()));
 
@@ -53,7 +53,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductResponse updateProduct(Long id, CreateProductRequest request) {
+    public ProductResponse updateProduct(Long id, ProductRequest request) {
         Product product = getProductEntityById(id);
         
         Category category = categoryRepository.findById(request.getCategoryId())
