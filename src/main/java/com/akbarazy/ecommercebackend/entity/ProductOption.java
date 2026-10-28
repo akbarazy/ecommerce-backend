@@ -1,6 +1,7 @@
 package com.akbarazy.ecommercebackend.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,6 +40,7 @@ public class ProductOption {
     @Column(nullable = false, length = 100)
     private String name;
 
+    @NotEmpty(message = "Option values are required")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "productOption", cascade = CascadeType.ALL, orphanRemoval = true)

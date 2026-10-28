@@ -52,7 +52,7 @@ class ProductRequestTest {
                 .sku("TSHIRT-BLK-M")
                 .price(new BigDecimal("150000.00"))
                 .stock(10)
-                .optionValues(List.of(var1Color, var1Size))
+                .variantOptions(List.of(var1Color, var1Size))
                 .build();
 
         return ProductRequest.builder()
@@ -128,7 +128,7 @@ class ProductRequestTest {
                 .value("Black")
                 .build();
 
-        request.getVariants().get(0).setOptionValues(List.of(var1Color));
+        request.getVariants().get(0).setVariantOptions(List.of(var1Color));
 
         Set<ConstraintViolation<ProductRequest>> violations = validator.validate(request);
         assertFalse(violations.isEmpty());
@@ -154,7 +154,7 @@ class ProductRequestTest {
                 .value("Cotton")
                 .build();
 
-        request.getVariants().get(0).setOptionValues(List.of(var1Color, var1Size, unregisteredMaterial));
+        request.getVariants().get(0).setVariantOptions(List.of(var1Color, var1Size, unregisteredMaterial));
 
         Set<ConstraintViolation<ProductRequest>> violations = validator.validate(request);
         assertFalse(violations.isEmpty());
@@ -180,7 +180,7 @@ class ProductRequestTest {
                 .value("L")
                 .build();
 
-        request.getVariants().get(0).setOptionValues(List.of(var1Color, var1Size1, var1Size2));
+        request.getVariants().get(0).setVariantOptions(List.of(var1Color, var1Size1, var1Size2));
 
         Set<ConstraintViolation<ProductRequest>> violations = validator.validate(request);
         assertFalse(violations.isEmpty());
@@ -202,7 +202,7 @@ class ProductRequestTest {
                 .value("XL")
                 .build();
 
-        request.getVariants().get(0).setOptionValues(List.of(var1Color, var1Size));
+        request.getVariants().get(0).setVariantOptions(List.of(var1Color, var1Size));
 
         Set<ConstraintViolation<ProductRequest>> violations = validator.validate(request);
         assertFalse(violations.isEmpty());
@@ -210,11 +210,12 @@ class ProductRequestTest {
     }
 
     @Test
-    @DisplayName("Options without predefined values list should accept any non-blank value")
-    void optionsWithoutPredefinedValues_ShouldAcceptAnyValue() {
+    @DisplayName("Option with empty values list should fail validation")
+    void optionWithEmptyValues_ShouldFailValidation() {
         ProductOptionRequest colorOption = ProductOptionRequest.builder()
                 .name("Color")
-                .build(); // values list is empty
+                .values(Collections.emptyList())
+                .build();
 
         VariantOptionRequest var1Color = VariantOptionRequest.builder()
                 .optionName("Color")
@@ -225,7 +226,7 @@ class ProductRequestTest {
                 .sku("TSHIRT-NVY")
                 .price(new BigDecimal("150000.00"))
                 .stock(10)
-                .optionValues(List.of(var1Color))
+                .variantOptions(List.of(var1Color))
                 .build();
 
         ProductRequest request = ProductRequest.builder()
@@ -236,6 +237,39 @@ class ProductRequestTest {
                 .build();
 
         Set<ConstraintViolation<ProductRequest>> violations = validator.validate(request);
-        assertTrue(violations.isEmpty(), "Expected no violations, but found: " + violations);
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Option values are required")));
+    }
+
+    @Test
+    @DisplayName("Option with blank value in values list should fail validation")
+    void optionWithBlankValue_ShouldFailValidation() {
+        ProductOptionRequest colorOption = ProductOptionRequest.builder()
+                .name("Color")
+                .values(List.of("   "))
+                .build();
+
+        VariantOptionRequest var1Color = VariantOptionRequest.builder()
+                .optionName("Color")
+                .value("Navy Blue")
+                .build();
+
+        ProductVariantRequest variant1 = ProductVariantRequest.builder()
+                .sku("TSHIRT-NVY")
+                .price(new BigDecimal("150000.00"))
+                .stock(10)
+                .variantOptions(List.of(var1Color))
+                .build();
+
+        ProductRequest request = ProductRequest.builder()
+                .name("Custom T-Shirt")
+                .categoryId(1L)
+                .options(List.of(colorOption))
+                .variants(List.of(variant1))
+                .build();
+
+        Set<ConstraintViolation<ProductRequest>> violations = validator.validate(request);
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v -> v.getMessage().equals("Option value cannot be blank")));
     }
 }

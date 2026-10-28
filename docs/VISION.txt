@@ -61,6 +61,8 @@ meniru sistem backend ecommerce bro.do
   - membuat unit test untuk ProductVariantService dan AdminProductVariantController
   - integration test alur (Buat Produk ber-Varian > Masuk Keranjang > Validasi Stok > Checkout Order)
   - cek kembali apakah ada repository yang tidak berguna atau tidak
+  - perbaiki struktur product, product variant, product option, dan variant option
+  - setiap option (size, color) dan nilai option (40, 41, red, blue) wajib memiliki stok 0 jika ingin dihapus atau dinonaktifkan
 
 ## FITUR
 ### ADMIN

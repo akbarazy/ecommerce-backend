@@ -1,6 +1,7 @@
 package com.akbarazy.ecommercebackend.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,7 @@ public class ProductOptionRequest {
     @Size(max = 100, message = "Option name must not exceed 100 characters")
     private String name;
 
+    @NotEmpty(message = "Option values are required")
     @Builder.Default
-    private List<String> values = new ArrayList<>();
+    private List<@NotBlank(message = "Option value cannot be blank") String> values = new ArrayList<>();
 }
