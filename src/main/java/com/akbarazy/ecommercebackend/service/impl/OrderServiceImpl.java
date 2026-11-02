@@ -6,15 +6,15 @@ import com.akbarazy.ecommercebackend.dto.response.OrderResponse;
 import com.akbarazy.ecommercebackend.entity.CartItem;
 import com.akbarazy.ecommercebackend.entity.Order;
 import com.akbarazy.ecommercebackend.entity.OrderItem;
+import com.akbarazy.ecommercebackend.entity.ProductVariant;
 import com.akbarazy.ecommercebackend.entity.User;
-import com.akbarazy.ecommercebackend.entity.Variant;
 import com.akbarazy.ecommercebackend.entity.enums.OrderStatus;
 import com.akbarazy.ecommercebackend.exception.BadRequestException;
 import com.akbarazy.ecommercebackend.exception.ResourceNotFoundException;
 import com.akbarazy.ecommercebackend.repository.CartItemRepository;
 import com.akbarazy.ecommercebackend.repository.OrderRepository;
+import com.akbarazy.ecommercebackend.repository.ProductVariantRepository;
 import com.akbarazy.ecommercebackend.repository.UserRepository;
-import com.akbarazy.ecommercebackend.repository.VariantRepository;
 import com.akbarazy.ecommercebackend.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final CartItemRepository cartItemRepository;
-    private final VariantRepository variantRepository;
+    private final ProductVariantRepository productVariantRepository;
     private final UserRepository userRepository;
 
     @Override
@@ -56,19 +57,30 @@ public class OrderServiceImpl implements OrderService {
             .build();
 
         for (CartItem cartItem : cartItems) {
-            Variant variant = cartItem.getVariant();
+            ProductVariant variant = productVariantRepository.findById(cartItem.getVariant().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("ProductVariant", "id", cartItem.getVariant().getId()));
 
-            if (variant.getStock() < cartItem.getQuantity()) {
-                String productName = cartItem.getProduct() != null ? cartItem.getProduct().getName() : "produk";
+            String productName = (variant.getProduct() != null && variant.getProduct().getName() != null)
+                ? variant.getProduct().getName()
+                : (cartItem.getProduct() != null ? cartItem.getProduct().getName() : "produk");
+
+            int availableStock = variant.getStock() != null ? variant.getStock() : 0;
+            if (availableStock < cartItem.getQuantity()) {
                 throw new BadRequestException("Stok " + productName + " tidak mencukupi");
             }
 
-            variant.setStock(variant.getStock() - cartItem.getQuantity());
-            variantRepository.save(variant);
+            int updatedRows = productVariantRepository.decrementStock(variant.getId(), cartItem.getQuantity());
+            if (updatedRows == 0) {
+                throw new BadRequestException("Stok " + productName + " tidak mencukupi");
+            }
+
+            variant.setStock(availableStock - cartItem.getQuantity());
 
             OrderItem orderItem = OrderItem.builder()
                 .order(order)
                 .variant(variant)
+                .productName(productName)
+                .variantAttributes(formatVariantAttributes(variant))
                 .quantity(cartItem.getQuantity())
                 .priceAtPurchase(variant.getPrice())
                 .build();
@@ -90,6 +102,23 @@ public class OrderServiceImpl implements OrderService {
         cartItemRepository.deleteByUserId(user.getId());
 
         return OrderResponse.from(savedOrder);
+    }
+
+    private String formatVariantAttributes(ProductVariant variant) {
+        if (variant.getValues() == null || variant.getValues().isEmpty()) {
+            return null;
+        }
+        return variant.getValues().stream()
+            .map(vo -> {
+                String optionName = vo.getOptionName();
+                String value = vo.getValue();
+                if (optionName != null && !optionName.isBlank()) {
+                    return optionName + ": " + value;
+                }
+                return value != null ? value : "";
+            })
+            .filter(str -> !str.isBlank())
+            .collect(Collectors.joining(", "));
     }
 
     @Override

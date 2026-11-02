@@ -5,13 +5,13 @@ import com.akbarazy.ecommercebackend.dto.request.UpdateCartItemRequest;
 import com.akbarazy.ecommercebackend.dto.response.CartItemResponse;
 import com.akbarazy.ecommercebackend.dto.response.CartResponse;
 import com.akbarazy.ecommercebackend.entity.CartItem;
+import com.akbarazy.ecommercebackend.entity.ProductVariant;
 import com.akbarazy.ecommercebackend.entity.User;
-import com.akbarazy.ecommercebackend.entity.Variant;
 import com.akbarazy.ecommercebackend.exception.BadRequestException;
 import com.akbarazy.ecommercebackend.exception.ResourceNotFoundException;
 import com.akbarazy.ecommercebackend.repository.CartItemRepository;
+import com.akbarazy.ecommercebackend.repository.ProductVariantRepository;
 import com.akbarazy.ecommercebackend.repository.UserRepository;
-import com.akbarazy.ecommercebackend.repository.VariantRepository;
 import com.akbarazy.ecommercebackend.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
     private final CartItemRepository cartItemRepository;
-    private final VariantRepository variantRepository;
+    private final ProductVariantRepository productVariantRepository;
     private final UserRepository userRepository;
 
     private User getUserByEmail(String email) {
@@ -39,10 +39,11 @@ public class CartServiceImpl implements CartService {
     public CartItemResponse addToCart(String email, CartItemRequest request) {
         User user = getUserByEmail(email);
         
-        Variant variant = variantRepository.findById(request.getVariantId())
-            .orElseThrow(() -> new ResourceNotFoundException("Variant", "id", request.getVariantId()));
+        ProductVariant variant = productVariantRepository.findById(request.getVariantId())
+            .orElseThrow(() -> new ResourceNotFoundException("ProductVariant", "id", request.getVariantId()));
         
-        if (variant.getStock() < request.getQuantity()) {
+        int availableStock = variant.getStock() != null ? variant.getStock() : 0;
+        if (availableStock < request.getQuantity()) {
             throw new BadRequestException("Stok tidak mencukupi");
         }
         
@@ -52,7 +53,7 @@ public class CartServiceImpl implements CartService {
         if (existingItemOptional.isPresent()) {
             CartItem existingItem = existingItemOptional.get();
             int newQuantity = existingItem.getQuantity() + request.getQuantity();
-            if (variant.getStock() < newQuantity) {
+            if (availableStock < newQuantity) {
                 throw new BadRequestException("Stok tidak mencukupi");
             }
             existingItem.setQuantity(newQuantity);
@@ -70,6 +71,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public CartResponse getCart(String email) {
         User user = getUserByEmail(email);
         
@@ -98,7 +100,11 @@ public class CartServiceImpl implements CartService {
         CartItem cartItem = cartItemRepository.findByIdAndUserId(itemId, user.getId())
             .orElseThrow(() -> new ResourceNotFoundException("CartItem", "id", itemId));
                 
-        if (cartItem.getVariant().getStock() < request.getQuantity()) {
+        ProductVariant variant = productVariantRepository.findById(cartItem.getVariant().getId())
+            .orElseThrow(() -> new ResourceNotFoundException("ProductVariant", "id", cartItem.getVariant().getId()));
+
+        int availableStock = variant.getStock() != null ? variant.getStock() : 0;
+        if (availableStock < request.getQuantity()) {
             throw new BadRequestException("Stok tidak mencukupi");
         }
         
