@@ -56,7 +56,7 @@ meniru sistem backend ecommerce bro.do
   [-] PUT /api/admin/variants/{id} (edit varian & stok)
   [-] DELETE /api/admin/variants/{id} (hapus varian)
 [-] menyesuaikan Public ProductController & CartController
-- mendaftarkan izin akses endpoint admin varian di SecurityConfig (ROLE_ADMIN)
+[-] mendaftarkan izin akses endpoint admin varian di SecurityConfig (ROLE_ADMIN)
 - memastikan endpoint baca varian publik dapat diakses tanpa autentikasi
 - update unit test yang terdampak (ProductServiceImplTest, AdminProductControllerTest, CartServiceImplTest, OrderServiceImplTest)
 - membuat unit test untuk validasi minimal 1 varian & 1 nilai varian pada CreateProduct

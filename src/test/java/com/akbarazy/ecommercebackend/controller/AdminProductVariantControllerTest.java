@@ -1,5 +1,6 @@
 package com.akbarazy.ecommercebackend.controller;
 
+import com.akbarazy.ecommercebackend.config.SecurityConfig;
 import com.akbarazy.ecommercebackend.dto.request.ProductVariantRequest;
 import com.akbarazy.ecommercebackend.dto.request.VariantOptionRequest;
 import com.akbarazy.ecommercebackend.dto.response.ProductVariantResponse;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -34,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AdminProductVariantController.class)
+@Import(SecurityConfig.class)
 class AdminProductVariantControllerTest {
 
     @Autowired
@@ -319,6 +322,41 @@ class AdminProductVariantControllerTest {
         mockMvc.perform(delete("/api/admin/variants/999").with(csrf()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false));
+    }
+
+    // ===== SECURITY (ROLE_ADMIN) =====
+
+    @Test
+    @WithMockUser(roles = "CUSTOMER")
+    @DisplayName("Admin variant endpoints should return 403 Forbidden when accessed by non-ADMIN user")
+    void adminVariantEndpoints_ForbiddenForCustomer() throws Exception {
+        ProductVariantRequest request = createValidRequest();
+
+        mockMvc.perform(post("/api/admin/products/1/variants")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/api/admin/products/1/variants"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(put("/api/admin/variants/100")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(delete("/api/admin/variants/100"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("Admin variant endpoints should return 403 Forbidden when accessed without authentication")
+    void adminVariantEndpoints_ForbiddenWhenUnauthenticated() throws Exception {
+        mockMvc.perform(get("/api/admin/products/1/variants"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(delete("/api/admin/variants/100"))
+                .andExpect(status().isForbidden());
     }
 }
 
