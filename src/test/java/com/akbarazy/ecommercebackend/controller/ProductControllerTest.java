@@ -1,27 +1,32 @@
 package com.akbarazy.ecommercebackend.controller;
 
+import com.akbarazy.ecommercebackend.dto.response.ProductOptionResponse;
 import com.akbarazy.ecommercebackend.dto.response.ProductResponse;
+import com.akbarazy.ecommercebackend.dto.response.ProductVariantResponse;
+import com.akbarazy.ecommercebackend.dto.response.VariantOptionResponse;
 import com.akbarazy.ecommercebackend.exception.ResourceNotFoundException;
+import com.akbarazy.ecommercebackend.repository.BlacklistedTokenRepository;
 import com.akbarazy.ecommercebackend.security.CustomUserDetailsService;
 import com.akbarazy.ecommercebackend.security.JwtTokenProvider;
-import com.akbarazy.ecommercebackend.repository.BlacklistedTokenRepository;
 import com.akbarazy.ecommercebackend.service.ProductService;
+import com.akbarazy.ecommercebackend.service.ProductVariantService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -42,6 +47,9 @@ class ProductControllerTest {
     private ProductService productService;
 
     @MockitoBean
+    private ProductVariantService productVariantService;
+
+    @MockitoBean
     private JwtTokenProvider jwtTokenProvider;
 
     @MockitoBean
@@ -50,15 +58,45 @@ class ProductControllerTest {
     @MockitoBean
     private BlacklistedTokenRepository blacklistedTokenRepository;
 
+    private ProductVariantResponse createMockVariantResponse(Long id, Long productId, String productName, String sku, BigDecimal price) {
+        VariantOptionResponse voColor = VariantOptionResponse.builder()
+                .id(1L)
+                .optionId(1L)
+                .optionName("Color")
+                .value("Black")
+                .build();
+
+        return ProductVariantResponse.builder()
+                .id(id)
+                .productId(productId)
+                .productName(productName)
+                .sku(sku)
+                .price(price)
+                .stock(10)
+                .weight(new BigDecimal("1.50"))
+                .optionValues(List.of(voColor))
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
     private ProductResponse createMockProductResponse(Long id, String name, BigDecimal price, String categoryName) {
+        ProductOptionResponse option = ProductOptionResponse.builder()
+                .id(1L)
+                .productId(id)
+                .name("Color")
+                .values(List.of("Black"))
+                .build();
+
+        ProductVariantResponse variant = createMockVariantResponse(10L, id, name, "SKU-" + id, price);
+
         return ProductResponse.builder()
                 .id(id)
                 .name(name)
                 .description("A great product")
-                .price(price)
-                .stock(10)
                 .categoryId(1L)
                 .categoryName(categoryName)
+                .options(List.of(option))
+                .variants(List.of(variant))
                 .createdAt(LocalDateTime.now())
                 .build();
     }
@@ -83,6 +121,7 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.data.content").isArray())
                 .andExpect(jsonPath("$.data.content.length()").value(2))
                 .andExpect(jsonPath("$.data.content[0].name").value("Laptop"))
+                .andExpect(jsonPath("$.data.content[0].variants[0].price").value(15000000.00))
                 .andExpect(jsonPath("$.data.content[1].name").value("Headphone"));
     }
 
@@ -156,7 +195,7 @@ class ProductControllerTest {
     // ===== GET PRODUCT BY ID =====
 
     @Test
-    @DisplayName("GET /api/products/{id} should return 200 with product details")
+    @DisplayName("GET /api/products/{id} should return 200 with product details and variants")
     void getProductById_Success() throws Exception {
         ProductResponse response = createMockProductResponse(1L, "Laptop", new BigDecimal("15000000.00"), "Electronics");
 
@@ -169,8 +208,8 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.message").value("Product fetched successfully"))
                 .andExpect(jsonPath("$.data.id").value(1))
                 .andExpect(jsonPath("$.data.name").value("Laptop"))
-                .andExpect(jsonPath("$.data.price").value(15000000.00))
-                .andExpect(jsonPath("$.data.categoryName").value("Electronics"));
+                .andExpect(jsonPath("$.data.categoryName").value("Electronics"))
+                .andExpect(jsonPath("$.data.variants[0].price").value(15000000.00));
     }
 
     @Test
@@ -202,10 +241,57 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.data.id").exists())
                 .andExpect(jsonPath("$.data.name").exists())
                 .andExpect(jsonPath("$.data.description").exists())
-                .andExpect(jsonPath("$.data.price").exists())
-                .andExpect(jsonPath("$.data.stock").exists())
+                .andExpect(jsonPath("$.data.options").isArray())
+                .andExpect(jsonPath("$.data.variants").isArray())
                 .andExpect(jsonPath("$.data.categoryId").exists())
                 .andExpect(jsonPath("$.data.categoryName").exists())
                 .andExpect(jsonPath("$.data.createdAt").exists());
+    }
+
+    // ===== GET PRODUCT VARIANTS =====
+
+    @Test
+    @DisplayName("GET /api/products/{id}/variants should return 200 with product variants")
+    void getProductVariants_Success() throws Exception {
+        ProductVariantResponse variant = createMockVariantResponse(10L, 1L, "Laptop", "SKU-1", new BigDecimal("15000000.00"));
+
+        when(productVariantService.getVariantsByProductId(1L)).thenReturn(List.of(variant));
+
+        mockMvc.perform(get("/api/products/1/variants")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Product variants fetched successfully"))
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].sku").value("SKU-1"))
+                .andExpect(jsonPath("$.data[0].price").value(15000000.00));
+    }
+
+    @Test
+    @DisplayName("GET /api/products/{id}/variants should return 404 when product not found")
+    void getProductVariants_ProductNotFound() throws Exception {
+        when(productVariantService.getVariantsByProductId(99L))
+                .thenThrow(new ResourceNotFoundException("Product", "id", 99L));
+
+        mockMvc.perform(get("/api/products/99/variants")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    @DisplayName("GET /api/products/variants/{variantId} should return 200 with variant details")
+    void getVariantById_Success() throws Exception {
+        ProductVariantResponse variant = createMockVariantResponse(10L, 1L, "Laptop", "SKU-1", new BigDecimal("15000000.00"));
+
+        when(productVariantService.getVariantById(10L)).thenReturn(variant);
+
+        mockMvc.perform(get("/api/products/variants/10")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Product variant fetched successfully"))
+                .andExpect(jsonPath("$.data.id").value(10))
+                .andExpect(jsonPath("$.data.sku").value("SKU-1"));
     }
 }

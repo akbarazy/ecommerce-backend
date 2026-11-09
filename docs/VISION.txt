@@ -1,4 +1,5 @@
 # PLANNING
+==========
 ## TUJUAN
 - ingin belajar java
 - ingin belajar spring boot
@@ -7,64 +8,67 @@
 meniru sistem backend ecommerce bro.do
 
 # ANALYSIS
+==========
 ## WBS
-- Product Variant
-  - membuat ProductOption (opsi dinamis per produk, misal: Size, Color)
-  - membuat ProductVariant (sku unik, price, stock, weight, relasi ke Product)
-  - membuat pemetaan nilai opsi varian (VariantOption yang menghubungkan ProductVariant dan ProductOption)
-  - menyesuaikan Product
-    - menghapus kolom obsolete (stock, price)
-    - menambahkan relasi OneToMany ke ProductOption dan ProductVariant
-  - menyesuaikan CartItem dan OrderItem
-    - mengganti relasi dari Product ke ProductVariant
-    - mencatat snapshot nama produk dan atribut varian pada OrderItem
-  - membuat ProductOptionRepository
-  - membuat ProductVariantRepository (pencarian by SKU, by ProductId, cek duplikasi SKU)
-  - menyesuaikan CartItemRepository (query cart berdasarkan userId dan variantId)
-  - menyesuaikan OrderItemRepository
-  - membuat ProductOptionRequest dan ProductOptionResponse
-  - membuat VariantOptionRequest dan VariantOptionResponse
-  - membuat ProductVariantRequest dan ProductVariantResponse
-  - menyesuaikan ProductRequest
-    - menambahkan validasi @NotEmpty/@Valid untuk daftar opsi dan minimal 1 varian awal
-    - validasi bahwa setiap varian wajib mendefinisikan nilai opsi yang telah didaftarkan
-  - menyesuaikan CartItemRequest (productId -> variantId)
-  - menyesuaikan CartItemResponse, OrderItemResponse, dan ProductResponse
-  - menyesuaikan ProductServiceImpl (Create Product flow)
-    - validasi minimal 1 varian dan minimal 1 nilai opsi (Requirement 2)
-    - validasi konsistensi opsi dinamis (Requirement 1)
-    - simpan Product beserta ProductOption dan initial ProductVariant secara transaksional (@Transactional)
-  - membuat ProductVariantService & ProductVariantServiceImpl
-    - implementasi addVariantToProduct (validasi SKU unik, kecocokan opsi dinamis dengan opsi produk)
-    - implementasi getVariantsByProductId dan getVariantById
-    - implementasi updateVariant (update harga, stok, SKU, dan kombinasi opsi)
-    - implementasi deleteVariant (validasi agar tidak menghapus varian terakhir jika produk aktif, serta cek keterkaitan dengan order)
-  - menyesuaikan CartServiceImpl
-    - validasi ketersediaan stok ProductVariant saat menambahkan atau mengupdate kuantitas keranjang
-  - menyesuaikan OrderServiceImpl
-    - validasi ketersediaan stok ProductVariant saat checkout
-    - pengurangan stok pada ProductVariant secara atomik
-  - memperbaiki ProductSpecification
-    - pencarian & filter harga (minPrice, maxPrice) melalui join ke ProductVariant (distinct)
-    - filter dinamis berdasarkan atribut/opsi jika diperlukan
-  - menyesuaikan AdminProductController (POST /api/admin/products menerima produk + varian awal)
-  - membuat AdminProductVariantController
-    - POST /api/admin/products/{productId}/variants (menambah varian susulan)
-    - GET /api/admin/products/{productId}/variants (melihat semua varian produk)
-    - PUT /api/admin/variants/{id} (edit varian & stok)
-    - DELETE /api/admin/variants/{id} (hapus varian)
-  - menyesuaikan Public ProductController & CartController
-  - mendaftarkan izin akses endpoint admin varian di SecurityConfig (ROLE_ADMIN)
-  - memastikan endpoint baca varian publik dapat diakses tanpa autentikasi
-  - update unit test yang terdampak (ProductServiceImplTest, AdminProductControllerTest, CartServiceImplTest, OrderServiceImplTest)
-  - membuat unit test untuk validasi minimal 1 varian & 1 nilai varian pada CreateProduct
-  - membuat unit test untuk ProductVariantService dan AdminProductVariantController
-  - integration test alur (Buat Produk ber-Varian > Masuk Keranjang > Validasi Stok > Checkout Order)
-  - cek kembali apakah ada repository yang tidak berguna atau tidak
-  - perbaiki struktur product, product variant, product option, dan variant option
-  - setiap option (size, color) dan nilai option (40, 41, red, blue) wajib memiliki stok 0 jika ingin dihapus atau dinonaktifkan
-  - category tiap produk harus bisa lebih dari 1
-  - setiap variant boleh memiliki image lebih dari 1
+### PRODUCT VARIANT
+[-] membuat ProductOption (opsi dinamis per produk, misal: Size, Color)
+[-] membuat ProductVariant (sku unik, price, stock, weight, relasi ke Product)
+[-] membuat pemetaan nilai opsi varian (VariantOption yang menghubungkan ProductVariant dan ProductOption)
+[-] menyesuaikan Product
+  [-] menghapus kolom obsolete (stock, price)
+  [-] menambahkan relasi OneToMany ke ProductOption dan ProductVariant
+[-] menyesuaikan CartItem dan OrderItem
+  [-] mengganti relasi dari Product ke ProductVariant
+  [-] mencatat snapshot nama produk dan atribut varian pada OrderItem
+[-] membuat ProductOptionRepository
+[-] membuat ProductVariantRepository (pencarian by SKU, by ProductId, cek duplikasi SKU)
+[-] menyesuaikan CartItemRepository (query cart berdasarkan userId dan variantId)
+[-] menyesuaikan OrderItemRepository
+[-] membuat ProductOptionRequest dan ProductOptionResponse
+[-] membuat VariantOptionRequest dan VariantOptionResponse
+[-] membuat ProductVariantRequest dan ProductVariantResponse
+[-] menyesuaikan ProductRequest
+  [-] menambahkan validasi @NotEmpty/@Valid untuk daftar opsi dan minimal 1 varian awal
+  [-] validasi bahwa setiap varian wajib mendefinisikan nilai opsi yang telah didaftarkan
+[-] menyesuaikan CartItemRequest (productId -> variantId)
+[-] menyesuaikan CartItemResponse, OrderItemResponse, dan ProductResponse
+[-] menyesuaikan ProductServiceImpl (Create Product flow)
+  [-] validasi minimal 1 varian dan minimal 1 nilai opsi (Requirement 2)
+  [-] validasi konsistensi opsi dinamis (Requirement 1)
+  [-] simpan Product beserta ProductOption dan initial ProductVariant secara transaksional (@Transactional)
+[-] membuat ProductVariantService & ProductVariantServiceImpl
+  [-] implementasi addVariantToProduct (validasi SKU unik, kecocokan opsi dinamis dengan opsi produk)
+  [-] implementasi getVariantsByProductId dan getVariantById
+  [-] implementasi updateVariant (update harga, stok, SKU, dan kombinasi opsi)
+  [-] implementasi deleteVariant (validasi agar tidak menghapus varian terakhir jika produk aktif, serta cek keterkaitan dengan order)
+[-] menyesuaikan CartServiceImpl
+  [-] validasi ketersediaan stok ProductVariant saat menambahkan atau mengupdate kuantitas keranjang
+[-] menyesuaikan OrderServiceImpl
+  [-] validasi ketersediaan stok ProductVariant saat checkout
+  [-] pengurangan stok pada ProductVariant secara atomik
+[-] memperbaiki ProductSpecification
+  [-] pencarian & filter harga (minPrice, maxPrice) melalui join ke ProductVariant (distinct)
+  [-] filter dinamis berdasarkan atribut/opsi jika diperlukan
+[-] menyesuaikan AdminProductController (POST /api/admin/products menerima produk + varian awal)
+[-] membuat AdminProductVariantController
+  [-] POST /api/admin/products/{productId}/variants (menambah varian susulan)
+  [-] GET /api/admin/products/{productId}/variants (melihat semua varian produk)
+  [-] PUT /api/admin/variants/{id} (edit varian & stok)
+  [-] DELETE /api/admin/variants/{id} (hapus varian)
+[-] menyesuaikan Public ProductController & CartController
+- mendaftarkan izin akses endpoint admin varian di SecurityConfig (ROLE_ADMIN)
+- memastikan endpoint baca varian publik dapat diakses tanpa autentikasi
+- update unit test yang terdampak (ProductServiceImplTest, AdminProductControllerTest, CartServiceImplTest, OrderServiceImplTest)
+- membuat unit test untuk validasi minimal 1 varian & 1 nilai varian pada CreateProduct
+- membuat unit test untuk ProductVariantService dan AdminProductVariantController
+- integration test alur (Buat Produk ber-Varian > Masuk Keranjang > Validasi Stok > Checkout Order)
+
+### REMINDER
+- cek kembali apakah ada repository yang tidak berguna atau tidak
+- perbaiki struktur product, product variant, product option, dan variant option
+- setiap option (size, color) dan nilai option (40, 41, red, blue) wajib memiliki stok 0 jika ingin dihapus atau dinonaktifkan
+- category tiap produk harus bisa lebih dari 1
+- setiap variant boleh memiliki image lebih dari 1
 
 ## FITUR
 ### ADMIN
