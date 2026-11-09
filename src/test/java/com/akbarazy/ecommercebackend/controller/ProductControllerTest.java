@@ -1,5 +1,6 @@
 package com.akbarazy.ecommercebackend.controller;
 
+import com.akbarazy.ecommercebackend.config.SecurityConfig;
 import com.akbarazy.ecommercebackend.dto.response.ProductOptionResponse;
 import com.akbarazy.ecommercebackend.dto.response.ProductResponse;
 import com.akbarazy.ecommercebackend.dto.response.ProductVariantResponse;
@@ -13,8 +14,8 @@ import com.akbarazy.ecommercebackend.service.ProductVariantService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -37,7 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ProductController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@Import(SecurityConfig.class)
 class ProductControllerTest {
 
     @Autowired

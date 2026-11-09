@@ -211,6 +211,51 @@ class AdminProductControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
+    @DisplayName("POST /api/admin/products should return 400 when options list is empty")
+    void createProduct_EmptyOptions() throws Exception {
+        ProductRequest request = createValidRequest();
+        request.setOptions(Collections.emptyList());
+
+        mockMvc.perform(post("/api/admin/products").with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.data.options").value("Product options are required"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("POST /api/admin/products should return 400 when an option has empty values list")
+    void createProduct_EmptyOptionValues() throws Exception {
+        ProductRequest request = createValidRequest();
+        request.getOptions().get(0).setValues(Collections.emptyList());
+
+        mockMvc.perform(post("/api/admin/products").with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.data['options[0].values']").value("Option values are required"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    @DisplayName("POST /api/admin/products should return 400 when a variant has empty variantOptions list")
+    void createProduct_EmptyVariantOptions() throws Exception {
+        ProductRequest request = createValidRequest();
+        request.getVariants().get(0).setVariantOptions(Collections.emptyList());
+
+        mockMvc.perform(post("/api/admin/products").with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.data.variantOptionsValid").value("Each variant must define values for all registered options"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("POST /api/admin/products should return 400 when variant does not match registered options")
     void createProduct_InvalidVariantOptions() throws Exception {
         ProductRequest request = createValidRequest();

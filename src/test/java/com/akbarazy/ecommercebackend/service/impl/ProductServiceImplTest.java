@@ -231,6 +231,19 @@ class ProductServiceImplTest {
     }
 
     @Test
+    @DisplayName("createProduct should throw BadRequestException when a variant has empty variantOptions")
+    void createProduct_VariantEmptyOptionValues_ThrowsBadRequestException() {
+        ProductRequest request = buildValidProductRequest();
+        request.getVariants().get(0).setVariantOptions(Collections.emptyList());
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(mockCategory));
+        when(productVariantRepository.existsBySku("TSHIRT-BLK-M")).thenReturn(false);
+
+        BadRequestException ex = assertThrows(BadRequestException.class, () -> productService.createProduct(request));
+        assertEquals("Variant with SKU 'TSHIRT-BLK-M' must define option values", ex.getMessage());
+    }
+
+    @Test
     @DisplayName("createProduct should throw BadRequestException when duplicate SKU exists in request")
     void createProduct_DuplicateSkuInRequest_ThrowsBadRequestException() {
         ProductRequest request = buildValidProductRequest();
