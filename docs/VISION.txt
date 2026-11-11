@@ -61,7 +61,7 @@ meniru sistem backend ecommerce bro.do
 [-] update unit test yang terdampak (ProductServiceImplTest, AdminProductControllerTest, CartServiceImplTest, OrderServiceImplTest)
 [-] membuat unit test untuk validasi minimal 1 varian & 1 nilai varian pada CreateProduct
 [-] membuat unit test untuk ProductVariantService dan AdminProductVariantController
-- integration test alur (Buat Produk ber-Varian > Masuk Keranjang > Validasi Stok > Checkout Order)
+[-] integration test alur (Buat Produk ber-Varian > Masuk Keranjang > Validasi Stok > Checkout Order)
 
 ### REMINDER
 - cek kembali apakah ada repository yang tidak berguna atau tidak
@@ -140,3 +140,4 @@ meniru sistem backend ecommerce bro.do
   - lombok
   - JUnit 5
   - mockito
+  - h2 database
