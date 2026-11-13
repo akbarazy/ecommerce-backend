@@ -38,7 +38,6 @@ class CategoryServiceImplTest {
         mockCategory = Category.builder()
                 .id(1L)
                 .name("Electronics")
-                .description("Electronic Items")
                 .products(new ArrayList<>())
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -48,7 +47,6 @@ class CategoryServiceImplTest {
     void createCategory_Success() {
         CreateCategoryRequest request = new CreateCategoryRequest();
         request.setName("Electronics");
-        request.setDescription("Electronic Items");
 
         when(categoryRepository.existsByName("Electronics")).thenReturn(false);
         when(categoryRepository.save(any(Category.class))).thenReturn(mockCategory);
@@ -92,7 +90,6 @@ class CategoryServiceImplTest {
     void updateCategory_Success() {
         CreateCategoryRequest request = new CreateCategoryRequest();
         request.setName("New Electronics");
-        request.setDescription("Updated Description");
 
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(mockCategory));
         when(categoryRepository.existsByName("New Electronics")).thenReturn(false);
@@ -101,7 +98,6 @@ class CategoryServiceImplTest {
         CategoryResponse response = categoryService.updateCategory(1L, request);
 
         assertEquals("New Electronics", response.getName());
-        assertEquals("Updated Description", response.getDescription());
     }
 
     @Test

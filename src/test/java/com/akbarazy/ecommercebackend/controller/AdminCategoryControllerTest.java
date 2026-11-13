@@ -52,7 +52,6 @@ class AdminCategoryControllerTest {
     private CreateCategoryRequest createValidRequest() {
         CreateCategoryRequest request = new CreateCategoryRequest();
         request.setName("Electronics");
-        request.setDescription("Electronic items");
         return request;
     }
 
@@ -60,7 +59,6 @@ class AdminCategoryControllerTest {
         return CategoryResponse.builder()
                 .id(1L)
                 .name("Electronics")
-                .description("Electronic items")
                 .productCount(0)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -141,7 +139,6 @@ class AdminCategoryControllerTest {
         CategoryResponse response = CategoryResponse.builder()
                 .id(1L)
                 .name("Updated Electronics")
-                .description("Electronic items")
                 .productCount(0)
                 .createdAt(LocalDateTime.now())
                 .build();

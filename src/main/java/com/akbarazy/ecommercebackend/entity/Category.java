@@ -28,9 +28,6 @@ public class Category {
     @Column(nullable = false, length = 100, unique = true)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
-
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)

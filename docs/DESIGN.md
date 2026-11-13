@@ -1,4 +1,4 @@
-# API ENDPOINTS
+# API SPECIFICATIONS
 ```
 Authentication:
 POST    /api/auth/register
@@ -51,11 +51,6 @@ GET     /api/admin/orders/{id}
 PUT     /api/admin/orders/{id}/status
 ```
 
-# API DTO'S
-```
-nanti diisi wkwkwk
-```
-
 # DATABASE DIAGRAM
 ```mermaid
 erDiagram
@@ -74,7 +69,6 @@ erDiagram
     CATEGORY {
         BIGINT id PK
         VARCHAR name UK
-        TEXT description
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }

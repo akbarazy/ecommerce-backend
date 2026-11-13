@@ -28,7 +28,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category category = Category.builder()
             .name(request.getName())
-            .description(request.getDescription())
             .build();
 
         return CategoryResponse.from(categoryRepository.save(category));
@@ -56,7 +55,6 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         category.setName(request.getName());
-        category.setDescription(request.getDescription());
 
         return CategoryResponse.from(categoryRepository.save(category));
     }

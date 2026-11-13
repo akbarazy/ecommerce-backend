@@ -66,7 +66,6 @@ class ProductVariantOrderFlowIntegrationTest {
     void setUp() {
         savedCategory = categoryRepository.save(Category.builder()
                 .name("Apparel & Fashion")
-                .description("Clothing and fashion items")
                 .build());
 
         customerUser = userRepository.save(User.builder()

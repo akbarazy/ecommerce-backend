@@ -42,11 +42,10 @@ class CategoryControllerTest {
     @MockitoBean
     private BlacklistedTokenRepository blacklistedTokenRepository;
 
-    private CategoryResponse createMockCategoryResponse(Long id, String name, String description, int productCount) {
+    private CategoryResponse createMockCategoryResponse(Long id, String name, int productCount) {
         return CategoryResponse.builder()
                 .id(id)
                 .name(name)
-                .description(description)
                 .productCount(productCount)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -55,8 +54,8 @@ class CategoryControllerTest {
     @Test
     @DisplayName("GET /api/categories should return 200 with list of categories")
     void getAllCategories_Success() throws Exception {
-        CategoryResponse category1 = createMockCategoryResponse(1L, "Electronics", "Electronic items", 5);
-        CategoryResponse category2 = createMockCategoryResponse(2L, "Fashion", "Fashion items", 3);
+        CategoryResponse category1 = createMockCategoryResponse(1L, "Electronics", 5);
+        CategoryResponse category2 = createMockCategoryResponse(2L, "Fashion", 3);
 
         when(categoryService.getAllCategories()).thenReturn(Arrays.asList(category1, category2));
 
@@ -87,7 +86,7 @@ class CategoryControllerTest {
     @Test
     @DisplayName("GET /api/categories should return complete response structure")
     void getAllCategories_ResponseStructure() throws Exception {
-        CategoryResponse category = createMockCategoryResponse(1L, "Electronics", "Electronic items", 5);
+        CategoryResponse category = createMockCategoryResponse(1L, "Electronics", 5);
 
         when(categoryService.getAllCategories()).thenReturn(Collections.singletonList(category));
 
@@ -99,7 +98,6 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$.timestamp").exists())
                 .andExpect(jsonPath("$.data[0].id").value(1))
                 .andExpect(jsonPath("$.data[0].name").value("Electronics"))
-                .andExpect(jsonPath("$.data[0].description").value("Electronic items"))
                 .andExpect(jsonPath("$.data[0].productCount").value(5))
                 .andExpect(jsonPath("$.data[0].createdAt").exists());
     }
