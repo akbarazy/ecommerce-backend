@@ -64,7 +64,6 @@ meniru sistem backend ecommerce bro.do
 [-] integration test alur (Buat Produk ber-Varian > Masuk Keranjang > Validasi Stok > Checkout Order)
 
 ### REMINDER
-- cek kembali apakah ada repository yang tidak berguna atau tidak digunakan
 - perbaiki struktur product, product variant, product option, dan variant option
 - setiap option (size, color) dan nilai option (40, 41, red, blue) wajib memiliki stok 0 jika ingin dihapus atau dinonaktifkan
 - category tiap produk harus bisa lebih dari 1

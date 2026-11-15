@@ -14,7 +14,6 @@ import com.akbarazy.ecommercebackend.exception.BadRequestException;
 import com.akbarazy.ecommercebackend.exception.ConflictException;
 import com.akbarazy.ecommercebackend.exception.ResourceNotFoundException;
 import com.akbarazy.ecommercebackend.repository.CategoryRepository;
-import com.akbarazy.ecommercebackend.repository.ProductOptionRepository;
 import com.akbarazy.ecommercebackend.repository.ProductRepository;
 import com.akbarazy.ecommercebackend.repository.ProductVariantRepository;
 import com.akbarazy.ecommercebackend.service.ProductService;
